@@ -1,0 +1,37 @@
+{
+  "id": "/",
+  "name": "দুরুদের সফর",
+  "short_name": "দুরুদ",
+  "description": "প্রতিদিন ১০০০ করে মোট ১,০০,০০০ দুরুদের হিসাব",
+  "lang": "bn",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#eaf4ee",
+  "theme_color": "#1d6b44",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": [
+    "lifestyle",
+    "education"
+  ]
+}

@@ -1,0 +1,1315 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1d6b44">
+<meta name="color-scheme" content="light dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="দুরুদ">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>দুরুদের সফর</title>
+<script>try{var t=localStorage.getItem("durud-theme")||"mint";if(t!=="deep")document.documentElement.setAttribute("data-theme",t)}catch(e){document.documentElement.setAttribute("data-theme","mint")}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@700;800&display=swap">
+<style>
+@font-face{font-family:"Uthmani";src:url("uthmani.woff2") format("woff2");font-display:swap}
+/* ﷺ only (Bengali fonts draw it badly) — Amiri subset, OFL */
+@font-face{font-family:"Saw";src:url("saw.woff2") format("woff2");unicode-range:U+FDFA;font-display:swap}
+/* Layout: one view at a time (home, durud, tasbih, history, achievement) above a fixed bottom tab bar with a raised tasbih button */
+/* Theme tokens. Bare :root = "deep" (emerald + gold); mint is the default for new users */
+:root{
+  --bg:#0a261c; --bg2:#0f3326; --card:#113a2a; --ink:#f3e7c4; --muted:#b4c4ab; --line:#2b5c46;
+  --accent:#d6b25e; --goldl:#3a3a1e; --g:#d6b25e; --gd:#b08a3a; --gl:#1a4635; --on-g:#0a261c;
+  --d1:#d6b25e; --d2:#6fbf8f; --d3:#f3e0a6; --d4:#3c8f70; --d5:#8a9a90; --navbg:#0d2e21; --shadow:rgba(0,0,0,.35);
+  --gold-hi:#f6e2a2; --gold-lo:#b08a3a;
+  --f-display:"Saw","Noto Serif Bengali","Hind Siliguri",serif;
+  --f-body:"Saw","Hind Siliguri",system-ui,sans-serif;
+  --f-arabic:"Uthmani","Amiri","Traditional Arabic",serif;
+  color-scheme:dark;
+}
+html[data-theme="mint"]{
+  --bg:#eaf4ee; --bg2:#dcece2; --card:#ffffff; --ink:#163a29; --muted:#5f7969; --line:#d4e6da;
+  --accent:#b08524; --goldl:#f6ecd0; --g:#1d6b44; --gd:#124a2f; --gl:#d4eadb; --on-g:#ffffff;
+  --d1:#1d6b44; --d2:#5aa77a; --d3:#c49a2c; --d4:#a5d0b6; --d5:#c9d3cc; --navbg:#ffffff; --shadow:rgba(29,107,68,.10);
+  --gold-hi:#8a6612; --gold-lo:#6b4f0e; color-scheme:only light;
+}
+html[data-theme="light"]{
+  --bg:#f7f4ec; --bg2:#efe9da; --card:#fffdf8; --ink:#22322a; --muted:#69756d; --line:#e6dcc4;
+  --accent:#a8801f; --goldl:#f4e9cb; --g:#1c6a43; --gd:#134a2f; --gl:#e2efe5; --on-g:#ffffff;
+  --d1:#1c6a43; --d2:#5aa77a; --d3:#c49a2c; --d4:#a5d0b6; --d5:#d6d1c4; --navbg:#fffdf8; --shadow:rgba(60,50,20,.10);
+  --gold-hi:#8b6914; --gold-lo:#6e5210; color-scheme:only light;
+}
+html[data-theme="dark"]{
+  --bg:#0f1211; --bg2:#161b19; --card:#1b211f; --ink:#ece5d1; --muted:#9aa49d; --line:#2b3330;
+  --accent:#d4af5a; --goldl:#2e2a1c; --g:#4fae7c; --gd:#2f7d55; --gl:#20302a; --on-g:#0f1211;
+  --d1:#4fae7c; --d2:#8fd1aa; --d3:#d4af5a; --d4:#3d6f56; --d5:#5d6a63; --navbg:#161b19; --shadow:rgba(0,0,0,.45);
+  --gold-hi:#f3dc9a; --gold-lo:#a88536; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{background:var(--bg);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;
+  -webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+input{-webkit-user-select:text;user-select:text}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit}
+.num{font-variant-numeric:tabular-nums}
+.ar{font-family:var(--f-arabic);direction:rtl}
+.app{max-width:480px;margin:0 auto;min-height:100vh;padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+.pad{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.stack{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--card);border-radius:18px;padding:14px;box-shadow:0 4px 14px var(--shadow);border:1px solid var(--line)}
+.h{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:700;font-size:15px}
+.h small{font-weight:500;color:var(--muted);font-size:12.5px}
+.btn{font-size:15px;font-weight:600;border-radius:12px;padding:8px 14px;cursor:pointer;border:1px solid color-mix(in srgb,var(--accent) 45%,var(--line));background:var(--card);color:var(--g)}
+.btn.primary{background:var(--g);color:var(--on-g);border-color:var(--g)}
+.btn.ghost{color:var(--muted)}
+.btn:focus-visible,.navbtn:focus-visible,.chip:focus-visible,.sw:focus-visible,.iconbtn:focus-visible,.cell:focus-visible,.li:focus-visible,.row:focus-visible,.fab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.iconbtn{width:36px;height:36px;border-radius:50%;border:0;display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--gl);color:var(--g);flex:none}
+.iconbtn svg{width:20px;height:20px}
+
+/* ---------- home ---------- */
+.hero{position:relative;color:#fff;background:#0b2a1c url(hero.jpg) center 40%/cover;
+  padding:calc(14px + env(safe-area-inset-top,0px)) max(18px,env(safe-area-inset-right,0px)) 40px max(18px,env(safe-area-inset-left,0px))}
+.hero::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,38,24,.62) 0%,rgba(8,38,24,.72) 50%,rgba(8,38,24,.9) 100%)}
+.hero>*{position:relative}
+.hero .top{display:flex;justify-content:space-between;align-items:center;font-size:13px;opacity:.92}
+.hero .iconbtn{background:rgba(255,255,255,.18);color:#fff}
+.hdate{margin-top:6px;font-size:13px;color:#f6e2a2;opacity:.95}
+.hdate span{color:#fff;opacity:.85}
+.salam{font-size:21px;margin-top:8px;color:#f6e2a2;line-height:1.7}
+.big{font-family:var(--f-display);font-size:50px;font-weight:800;line-height:1.1;margin-top:2px}
+.big small{font-size:18px;opacity:.85;font-weight:600;font-family:var(--f-body)}
+.pbar{height:9px;border-radius:6px;background:rgba(255,255,255,.25);margin-top:10px;overflow:hidden}
+.pbar i{display:block;height:100%;background:linear-gradient(90deg,#c9a14a,#f6e2a2);border-radius:6px;transition:width .3s}
+.homebody{margin-top:-22px;position:relative}
+.moti{background:linear-gradient(120deg,color-mix(in srgb,var(--goldl) 85%,var(--card)),var(--card));border:1px solid color-mix(in srgb,var(--accent) 40%,var(--line));
+  border-radius:18px;padding:13px 14px;display:flex;gap:12px;align-items:flex-start;box-shadow:0 4px 14px var(--shadow)}
+.moti .mi{width:38px;height:38px;border-radius:50%;background:var(--goldl);display:flex;align-items:center;justify-content:center;font-size:19px;flex:none}
+.moti b{display:block;font-size:16px;color:var(--g)}
+.moti p{margin:2px 0 0;font-size:13.5px;color:var(--muted);line-height:1.6}
+.week{display:flex;justify-content:space-between;margin-top:12px;gap:2px}
+.wd{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11.5px;color:var(--muted);flex:1;min-width:0}
+.wd i{width:34px;height:34px;max-width:100%;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-style:normal;font-size:15px;color:var(--on-g);font-weight:700}
+.wd.ok i{background:var(--g);border-color:var(--g)}
+.wd.part i{border-color:var(--g)}
+.wd.today{color:var(--g);font-weight:700}
+.wd.off{opacity:.45}
+.cont{display:flex;background:linear-gradient(120deg,#1f7149,#124a2f);color:#fff;border-radius:18px;overflow:hidden;min-height:120px;box-shadow:0 6px 18px var(--shadow)}
+.cont .t{padding:14px;flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
+.cont small{opacity:.82;font-size:12.5px}.cont b{font-size:18px}
+.pill{align-self:flex-start;background:#fff;color:#1d6b44;border:0;border-radius:999px;padding:6px 14px;font-size:13.5px;font-weight:700;margin-top:auto;cursor:pointer}
+.ctag{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;background:linear-gradient(90deg,#d6b25e,#f6e2a2);color:#124a2f;border-radius:10px;padding:3px 10px;font-size:12.5px;font-weight:700;margin:6px 0 8px}
+.cont .ctag b{font-size:14.5px;font-family:var(--f-display);font-weight:800;letter-spacing:.4px}
+.ctag.done{background:rgba(255,255,255,.18);color:#fff}
+.cont img{width:42%;max-width:170px;object-fit:cover;-webkit-mask-image:linear-gradient(90deg,transparent,#000 40%);mask-image:linear-gradient(90deg,transparent,#000 40%)}
+.rows{display:flex;flex-direction:column;gap:2px;margin-top:6px}
+.row{display:flex;align-items:center;gap:10px;font-size:14.5px;padding:7px 4px;border:0;background:none;text-align:left;cursor:pointer;border-radius:10px;width:100%}
+.row:hover{background:var(--gl)}
+.row i{width:11px;height:11px;border-radius:3px;flex:none}
+.row b{margin-left:auto}
+.row .go{color:var(--muted);font-size:13px}
+.faz blockquote{margin:8px 0 0;font-size:15.5px;line-height:1.75}
+.faz cite{display:block;font-style:normal;font-size:12.5px;color:var(--accent);font-weight:600;margin-top:6px}
+.faz .nav2{display:flex;gap:6px}
+.faz .nav2 button{width:30px;height:30px;border-radius:50%;cursor:pointer;border:1px solid var(--line);background:var(--bg);color:var(--g);font-size:16px;line-height:1}
+
+/* ---------- page head ---------- */
+.pagehead{display:flex;justify-content:space-between;align-items:center;padding-top:calc(18px + env(safe-area-inset-top,0px));padding-bottom:12px}
+.pagehead h2{margin:0;font-size:26px;font-weight:700;color:var(--g);line-height:1.2}
+
+/* ---------- durud list ---------- */
+.dcard{display:flex;flex-direction:column;gap:10px}
+.dcard .top2{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.dcard h3{margin:0;font-size:17px;color:var(--g);text-wrap:balance}
+.dcard .today{font-size:12.5px;color:var(--muted);white-space:nowrap}
+.dcard .arab{font-size:23px;line-height:2.05;text-align:center;color:var(--ink);margin:2px 0}
+.dcard .mean{margin:0;font-size:14.5px;line-height:1.7}
+.dcard .mean b{color:var(--accent)}
+.fbox{border:1.5px solid color-mix(in srgb,var(--accent) 60%,var(--line));border-radius:12px;padding:10px 12px;background:color-mix(in srgb,var(--goldl) 55%,transparent);font-size:14.5px;line-height:1.7}
+.ref{margin:0;font-size:12px;color:var(--muted)}
+.dcard .btn{margin-left:auto}
+
+.fazread{background:linear-gradient(135deg,var(--card),color-mix(in srgb,var(--goldl) 60%,var(--card)));border-color:color-mix(in srgb,var(--accent) 40%,var(--line));display:flex;flex-direction:column;gap:8px}
+.fazread h3{margin:0;font-size:17px;color:var(--g)}
+.fr-body{font-size:14.5px;line-height:1.8;max-height:7.2em;overflow:hidden;position:relative}
+.fr-body p{margin:0 0 8px}
+.fr-body::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2.4em;background:linear-gradient(transparent,color-mix(in srgb,var(--goldl) 60%,var(--card)))}
+.fazread.open .fr-body{max-height:none}.fazread.open .fr-body::after{display:none}
+.fr-ayah{font-size:22px;line-height:2;text-align:center;color:var(--ink)}
+.fazread .btn{align-self:flex-start}
+/* ---------- tasbih (always dark green: a focus space) ---------- */
+#v-tasbih{position:fixed;inset:0;z-index:20;color:#f3e7c4;background:radial-gradient(ellipse at 50% 32%,#196040,#0b2a1c 72%);
+  display:flex;flex-direction:column;touch-action:manipulation;cursor:pointer;
+  padding:calc(10px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.tin{max-width:480px;width:100%;margin:0 auto;display:flex;flex-direction:column;flex:1;min-height:0}
+.tb{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tb .iconbtn{background:rgba(255,255,255,.1);color:#f3e7c4}
+.selwrap{position:relative;min-width:0}
+#tSel{appearance:none;-webkit-appearance:none;font:inherit;font-size:15px;font-weight:600;color:#e8c873;background:rgba(0,0,0,.18);border:1px solid rgba(214,178,94,.55);border-radius:999px;padding:6px 32px 6px 14px;cursor:pointer;max-width:62vw}
+#tSel option{color:#163a29;background:#fff}
+.selwrap::after{content:"▾";position:absolute;right:13px;top:50%;transform:translateY(-52%);color:#e8c873;pointer-events:none}
+.tar{font-size:21px;text-align:center;line-height:2;color:#f6e2a2;margin:12px 0 0;max-height:24vh;overflow:auto;padding:0 4px}
+.ringwrap{flex:1;display:flex;align-items:center;justify-content:center;min-height:0}
+.bring{position:relative;width:min(72vw,280px,38vh);aspect-ratio:1;max-width:100%}
+.bring svg{width:100%;height:100%}
+.bring circle{transition:fill .15s}
+.bring .c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.bring .n{font-family:var(--f-display);font-size:clamp(46px,15vw,70px);font-weight:800;color:#f6e2a2;line-height:1}
+.bring .s{font-size:13px;opacity:.75;margin-top:6px}
+.bump{animation:bump .18s ease-out}
+@keyframes bump{50%{transform:scale(1.08)}}
+.tot{display:flex;justify-content:center;gap:18px;font-size:13.5px;opacity:.9}
+.tot b{color:#f6e2a2}
+.tchips{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.tchip{border:1px solid rgba(214,178,94,.55);border-radius:12px;padding:8px 14px;font-weight:600;color:#e8c873;background:rgba(0,0,0,.15);cursor:pointer;font-size:15px}
+.tchip:focus-visible,#tSel:focus-visible{outline:2px solid #f6e2a2;outline-offset:2px}
+.hint{text-align:center;font-size:12.5px;opacity:.6;margin-top:10px}
+
+/* ---------- history ---------- */
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px}
+.seg button{flex:1;border:0;background:none;padding:7px;border-radius:9px;font-size:14px;color:var(--muted);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--g);color:var(--on-g);font-weight:700}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 6px;text-align:center;min-width:0}
+.tile b{display:block;font-size:19px;color:var(--g)}
+.tile span{font-size:12px;color:var(--muted)}
+.chart svg{width:100%;height:auto;display:block;margin-top:8px}
+.leg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted);margin-top:6px}
+.leg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.list{display:flex;flex-direction:column;gap:6px}
+.li{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;font-size:14.5px;cursor:pointer;width:100%;text-align:left}
+.li b{color:var(--g)}
+
+/* ---------- achievement ---------- */
+.overall{display:grid;grid-template-columns:140px 1fr;gap:16px;align-items:center}
+.ring{position:relative;width:140px;height:140px}
+.ring svg{width:140px;height:140px;transform:rotate(-90deg)}
+.ring .c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .pct{font-family:var(--f-display);font-size:28px;font-weight:800;color:var(--g)}
+.ring .of{font-size:12px;color:var(--muted)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}
+.stat b{display:block;font-size:20px;font-weight:700;line-height:1.2;color:var(--g)}
+.stat span{font-size:12.5px;color:var(--muted)}
+@media (max-width:400px){.overall{grid-template-columns:1fr;justify-items:center}.stats{width:100%}}
+.medals{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;text-align:center;margin-top:10px}
+.medal{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:var(--muted)}
+.medal svg{width:46px;height:56px;max-width:100%}
+.medal.locked svg{opacity:.3;filter:grayscale(1)}
+.medal.earned b{color:var(--accent)}
+.medal b{font-size:12.5px;font-variant-numeric:tabular-nums}
+.grid{display:grid;grid-template-columns:repeat(10,1fr);gap:5px;margin-top:10px}
+.cell{aspect-ratio:1;max-width:100%;border-radius:5px;border:0;background:var(--gl);cursor:pointer;padding:0}
+.cell.l1{background:color-mix(in srgb,var(--g) 30%,var(--gl))}
+.cell.l2{background:color-mix(in srgb,var(--g) 62%,var(--gl))}
+.cell.full{background:var(--g)}
+.cell.future{opacity:.4;cursor:default}
+.cell.today{box-shadow:0 0 0 2px var(--accent)}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:10px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;vertical-align:-1px;margin-right:4px}
+.pager{display:flex;gap:6px}
+.pager button{width:28px;height:28px;border-radius:50%;cursor:pointer;border:1px solid var(--line);background:var(--bg);color:var(--g)}
+.pager button:disabled{opacity:.35;cursor:default}
+
+/* ---------- progress page: achievement card ---------- */
+.ach{display:flex;flex-direction:column;gap:10px}
+.achrow{display:flex;align-items:center;gap:12px}
+.ring.sm{width:76px;height:76px;flex:none}.ring.sm svg{width:76px;height:76px}.ring.sm .pct{font-size:17px}
+.achrow .medals{flex:1;margin-top:0;gap:2px}.achrow .medal svg{width:34px;height:42px}.achrow .medal b{font-size:11px}
+.stats4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center;border-top:1px solid var(--line);padding-top:10px}
+.stats4 b{display:block;font-size:16px;color:var(--g)}.stats4 span{font-size:11.5px;color:var(--muted)}
+/* ---------- sunnah revival ---------- */
+.sum{display:flex;gap:14px;align-items:center;background:linear-gradient(120deg,#1f7149,#124a2f);color:#fff;border-radius:18px;padding:14px;box-shadow:0 6px 18px var(--shadow)}
+.ring2{width:78px;height:78px;position:relative;flex:none}.ring2 svg{width:78px;height:78px;transform:rotate(-90deg)}
+.ring2 b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--f-display);font-size:20px;color:#f6e2a2}
+.ring2 circle{transition:stroke-dashoffset .4s}
+.sum strong{font-size:17px;display:block}.sum p{margin:2px 0 0;font-size:13px;opacity:.88;line-height:1.55}
+.smain{display:flex;flex-direction:column;margin-top:4px}
+.sit{display:flex;gap:12px;align-items:flex-start;padding:10px 2px;border-bottom:1px solid var(--line)}.sit:last-child{border:0}
+.tick{width:30px;height:30px;border-radius:9px;border:2px solid var(--accent);flex:none;display:flex;align-items:center;justify-content:center;background:none;cursor:pointer;color:#fff;font-weight:700;font-size:16px;padding:0}
+.tick[aria-pressed="true"]{background:var(--accent)}
+.tick:focus-visible,.sub:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sit .t{flex:1;min-width:0}.sit b{font-size:15.5px;display:block}.sit p{margin:2px 0 0;font-size:12.5px;color:var(--muted);line-height:1.55}
+.wk{display:flex;gap:5px;margin-top:6px}.wk i{width:10px;height:10px;border-radius:50%;background:var(--gl)}.wk i.on{background:var(--g)}.wk i.tdy{box-shadow:0 0 0 1.5px var(--accent)}
+.subs{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+.sub{font-size:12.5px;border-radius:999px;padding:3px 11px;border:1px solid var(--line);background:var(--bg);color:var(--muted);cursor:pointer}
+.sub[aria-pressed="true"]{background:var(--gl);color:var(--g);border-color:var(--gl);font-weight:600}
+.srow{display:flex;gap:10px;align-items:center;padding:8px 2px;font-size:14.5px;width:100%;border:0;background:none;text-align:left;cursor:pointer;border-bottom:1px solid var(--line)}
+.srow:last-child{border:0}
+.srow .tick{width:22px;height:22px;border-radius:7px;font-size:12px;pointer-events:none}
+.srow small{margin-left:auto;color:var(--muted);font-size:11.5px;white-space:nowrap;padding-left:8px}
+.srow:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* ---------- fasting reminder ---------- */
+.fast{background:linear-gradient(120deg,#183b5a,#0f2a40);color:#eaf2fb;border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:8px;box-shadow:0 6px 18px var(--shadow)}
+.fast b{font-size:16px;color:#f6e2a2}.fast p{margin:0;font-size:13.5px;opacity:.9;line-height:1.6}
+.fast .acts{display:flex;gap:8px;flex-wrap:wrap}
+.fast button{border-radius:12px;padding:7px 12px;font-weight:600;font-size:14px;cursor:pointer;border:1px solid rgba(246,226,162,.5);background:rgba(255,255,255,.08);color:#f6e2a2}
+.fast button[aria-pressed="true"]{background:#e8c873;color:#0f2a40;border-color:#e8c873}
+/* ---------- bottom nav ---------- */
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;z-index:10;background:var(--navbg);
+  box-shadow:0 -4px 18px var(--shadow);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);align-items:end;
+  padding:6px max(6px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-left,0px))}
+.navbtn{display:flex;flex-direction:column;align-items:center;gap:2px;border:0;background:none;color:var(--muted);font-size:11.5px;cursor:pointer;padding:4px 0;min-width:0}
+.navbtn svg{width:23px;height:23px}
+.navbtn span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.navbtn[aria-current="page"]{color:var(--g);font-weight:700}
+.fab{justify-self:center;width:62px;height:62px;border-radius:50%;border:0;cursor:pointer;margin-top:-30px;color:#f6e2a2;
+  background:linear-gradient(145deg,#2a8a59,#124a2f);box-shadow:0 8px 18px rgba(18,74,47,.45),0 0 0 5px var(--navbg);display:flex;align-items:center;justify-content:center}
+.fab svg{width:32px;height:32px}
+body.tasbih-on .bnav{display:none}
+
+/* ---------- sheets & modals ---------- */
+.modal{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5);
+  padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.modal.sheet{align-items:flex-end;padding-bottom:0}
+.mcard{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:20px;padding:22px 18px;max-width:420px;width:100%;
+  display:flex;flex-direction:column;gap:14px;box-shadow:0 20px 60px rgba(0,0,0,.4);max-height:88vh;overflow:auto;animation:pop .35s cubic-bezier(.2,1.3,.4,1)}
+.sheet .mcard{border-radius:20px 20px 0 0;max-width:480px;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px));animation:up .3s ease-out}
+.mcard h2{margin:0;font-size:21px;color:var(--g);text-align:center}
+.mcard h2.salam2{font-family:var(--f-arabic);font-size:25px;line-height:1.8;direction:rtl;color:var(--accent)}
+.mcard p{margin:0}
+.center{text-align:center}
+.field{display:flex;flex-direction:column;gap:8px}
+.field>span{font-weight:600;font-size:15px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:14px;cursor:pointer;border-radius:999px;padding:6px 13px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-variant-numeric:tabular-nums}
+.chip[aria-pressed="true"]{background:var(--g);color:var(--on-g);border-color:var(--g);font-weight:600}
+.inp{font:inherit;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%;max-width:180px}
+.themes{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.sw{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:var(--muted);background:none;border:0;cursor:pointer;padding:2px}
+.sw i{width:42px;height:42px;border-radius:50%;display:block;box-shadow:0 0 0 1px var(--line)}
+.sw[aria-pressed="true"] i{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--accent)}
+.sw[aria-pressed="true"]{color:var(--ink);font-weight:600}
+.rowline{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.toggle{width:50px;height:28px;border-radius:999px;border:0;background:var(--line);position:relative;cursor:pointer;flex:none}
+.toggle::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.toggle[aria-pressed="true"]{background:var(--g)}
+.toggle[aria-pressed="true"]::after{left:25px}
+.toggle:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mgbox{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;background:var(--gl);border-radius:12px;padding:10px 12px}.mgbox b{font-size:20px;color:var(--g)}.mgbox small{color:var(--muted)}
+.sep{border:0;border-top:1px solid var(--line);margin:0}
+.erow{display:grid;grid-template-columns:12px 1fr 110px;gap:10px;align-items:center;font-size:14.5px}
+.erow i{width:11px;height:11px;border-radius:3px}
+.erow .inp{max-width:none;text-align:center}
+.btnrow{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.medalbig svg{width:96px;height:116px}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(110px + env(safe-area-inset-bottom,0px));z-index:45;background:#124a2f;color:#f6e2a2;
+  padding:10px 18px;border-radius:999px;font-weight:600;font-size:14.5px;box-shadow:0 8px 24px rgba(0,0,0,.3);max-width:90vw;text-align:center}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:50}
+/* opening screen: Toma's painting, 3 s or until tapped */
+#splash{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff;
+  background:radial-gradient(circle at 50% 40%,#2f9a64 0%,#17603d 35%,#0b2e1e 75%,#071d13);transition:opacity .45s ease;cursor:pointer;font-family:var(--f-body)}
+#splash.out{opacity:0;pointer-events:none}
+#splash img{width:min(78vw,330px);height:auto;filter:drop-shadow(0 16px 26px rgba(0,0,0,.45));animation:spIn .7s ease both}
+#splash .orn{color:#d6b25e;font-size:13px;letter-spacing:8px;margin-top:20px}
+#splash p{font-size:14.5px;line-height:1.65;margin:8px 0 0;padding:0 34px;opacity:.92;max-width:420px}
+#splash .wel{position:absolute;left:0;right:0;bottom:calc(36px + env(safe-area-inset-bottom,0px));color:#f6e2a2}
+#splash .wel .ar{display:block;font-family:var(--f-arabic);font-size:30px;line-height:1.35;direction:rtl}
+#splash .wel small{display:block;font-size:14px;opacity:.9;margin-top:2px}
+#splash i{position:absolute;bottom:0;left:0;height:3px;width:0;background:linear-gradient(90deg,#d6b25e,#f6e2a2);animation:spBar 3s linear forwards}
+@keyframes spIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+@keyframes spBar{to{width:100%}}
+@keyframes pop{from{transform:scale(.8);opacity:0}to{transform:none;opacity:1}}
+@keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+/* ---------- Jumu'ah: gold dress from Thursday maghrib to Friday maghrib ---------- */
+.jbadge{display:inline-flex;align-items:center;gap:8px;margin-top:10px;padding:4px 14px;border-radius:999px;font-size:13.5px;font-weight:700;color:#3a2a06;
+  background:linear-gradient(90deg,#c9a14a,#f6e2a2,#c9a14a);box-shadow:0 2px 10px rgba(201,161,74,.45)}
+body.jumuah .hero::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 -3px 0 #d6b25e;background:radial-gradient(ellipse at 80% 0%,rgba(246,226,162,.28),transparent 60%)}
+.jcard{position:relative;overflow:hidden;border-radius:18px;padding:16px;color:#2c2006;
+  background:linear-gradient(135deg,#f9eccb,#f3d98f 55%,#e8c46c);box-shadow:0 6px 18px rgba(176,133,36,.28);border:1px solid #d9b45e}
+.jcard::before{content:"";position:absolute;right:-30px;top:-30px;width:130px;height:130px;border-radius:50%;border:14px solid rgba(255,255,255,.28)}
+.jcard .jt{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;color:#6b4c0c}
+.jcard blockquote{margin:8px 0 0;font-size:15.5px;line-height:1.75;color:#2c2006;position:relative}
+.jcard cite{display:block;font-style:normal;font-size:12.5px;color:#7a5a12;font-weight:600;margin-top:6px}
+.jcard .jn{display:flex;gap:6px;margin-left:auto}
+.jcard .jn button{width:28px;height:28px;border-radius:50%;border:1px solid rgba(107,76,12,.35);background:rgba(255,255,255,.45);color:#6b4c0c;cursor:pointer;line-height:1}
+.jtag{align-self:center;margin-top:10px;padding:3px 12px;border-radius:999px;font-size:12.5px;font-weight:700;color:#3a2a06;background:linear-gradient(90deg,#c9a14a,#f6e2a2,#c9a14a)}
+body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.45))}
+/* ---------- Jumu'ah checklist ---------- */
+.jlist .items{display:flex;flex-direction:column;gap:4px;margin-top:8px}
+.jitem{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;background:none;padding:8px 4px;border-radius:10px;cursor:pointer;font-size:15px}
+.jitem:hover{background:var(--gl)}
+.jitem .bx{width:24px;height:24px;border-radius:7px;border:2px solid color-mix(in srgb,var(--accent) 70%,var(--line));flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700}
+.jitem[aria-pressed="true"] .bx{background:var(--accent);border-color:var(--accent)}
+.jitem[aria-pressed="true"] .tx{color:var(--muted);text-decoration:line-through}
+.jitem small{display:block;color:var(--muted);font-size:12.5px;text-decoration:none}
+.jitem:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.jbar{height:6px;border-radius:4px;background:var(--gl);overflow:hidden;margin-top:8px}.jbar i{display:block;height:100%;background:var(--accent);transition:width .3s}
+/* ---------- stories ---------- */
+.story{display:flex;flex-direction:column;gap:10px}
+.story h3{margin:0;font-size:17px;color:var(--g);text-wrap:balance}
+.story .body{margin:0;font-size:15px;line-height:1.8;white-space:pre-line}
+.lesson{border-radius:12px;padding:10px 12px;background:var(--gl);font-size:14.5px;line-height:1.7}
+.lesson b{color:var(--g)}
+.scard .prev{margin:8px 0 0;font-size:15px;line-height:1.75;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.scard .btn{margin-top:10px}
+.story.flash{animation:flash 1.6s ease-out}
+@keyframes flash{0%{box-shadow:0 0 0 3px var(--accent)}100%{box-shadow:0 4px 14px var(--shadow)}}
+/* ---------- audio ---------- */
+.play{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;border-radius:999px;padding:6px 12px;cursor:pointer;
+  border:1px solid color-mix(in srgb,var(--accent) 55%,var(--line));background:var(--card);color:var(--g)}
+.play svg{width:16px;height:16px}
+.dcard .acts{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+#tPlay{background:rgba(255,255,255,.1);color:#f3e7c4}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="splash" aria-hidden="true"><img src="splash.webp" alt=""><div class="orn">✦ ✦ ✦</div><p>হে আল্লাহ! আমাদের নবী মুহাম্মাদ ﷺ-এর উপর রহমত ও শান্তি বর্ষণ করুন।</p><div class="wel"><span class="ar">أَهْلًا وَسَهْلًا</span><small>দুরুদের সফরে আপনাকে স্বাগতম</small></div><i></i></div>
+<script>(function(){var s=document.getElementById("splash"),d=0;function go(){if(d)return;d=1;s.classList.add("out");setTimeout(function(){s.remove()},500)}s.addEventListener("click",go);setTimeout(go,3000)})();</script>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3.5 10.5 12 3.5l8.5 7V20a1 1 0 0 1-1 1H15v-6H9v6H4.5a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 6.5C10 5 7 4.5 4 5v13.5c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5zM12 6.5V20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20h16M7 17v-6M12 17V6M17 17v-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5.5a2.5 2.5 0 0 0 3 3.6M16 6h2.5a2.5 2.5 0 0 1-3 3.6M12 13v4M8.5 20.5h7M10 17h4v3.5h-4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+  <symbol id="i-beads" viewBox="0 0 32 32"><g fill="currentColor"><circle cx="16" cy="4.5" r="2.3"/><circle cx="22.6" cy="6.6" r="2.1"/><circle cx="26.4" cy="12.2" r="2.1"/><circle cx="26.4" cy="18.6" r="2.1"/><circle cx="22.6" cy="24" r="2.1"/><circle cx="9.4" cy="6.6" r="2.1"/><circle cx="5.6" cy="12.2" r="2.1"/><circle cx="5.6" cy="18.6" r="2.1"/><circle cx="9.4" cy="24" r="2.1"/><circle cx="16" cy="25.6" r="2.4"/><path d="M14.6 27.5h2.8l1 3.5h-4.8z"/></g></symbol>
+  <symbol id="i-set" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 12h3M11 12h9M4 17h11M19 17h1" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><circle cx="15" cy="7" r="2" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="9" cy="12" r="2" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="17" cy="17" r="2" fill="none" stroke="currentColor" stroke-width="1.9"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-mute" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path d="M16 9.5l5 5M21 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></symbol>
+  <symbol id="i-seed" viewBox="0 0 24 24"><path d="M12 21v-8M12 13c0-4 3-7 8-7 0 4-3 7-8 7zM12 15c0-3.5-2.5-6-7-6 0 3.5 2.5 6 7 6zM7 21h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+</svg>
+
+<div class="app">
+  <!-- HOME -->
+  <section class="view" id="v-home">
+    <div class="hero">
+      <div class="top"><span id="heroDay">দুরুদের সফর</span><button class="iconbtn" data-open="settings" aria-label="সেটিংস"><svg><use href="#i-set"/></svg></button></div>
+      <div class="hdate" id="hDate"></div>
+      <div class="jbadge" id="jBadge" hidden>✦ জুমু'আ মুবারক ✦</div>
+      <div class="salam ar">السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللّٰهِ وَبَرَكَاتُهُ</div>
+      <div class="big num"><span id="hCount">০</span> <small id="hGoal">/ ১,০০০ আজ</small></div>
+      <div class="pbar" aria-hidden="true"><i id="hBar" style="width:0%"></i></div>
+    </div>
+    <div class="homebody pad stack">
+      <div class="jcard" id="jCard" hidden><div class="jt">🕌 <span>জুমু'আর দিনে বেশি বেশি দুরুদ</span><div class="jn"><button type="button" id="jPrev" aria-label="আগেরটি">‹</button><button type="button" id="jNext" aria-label="পরেরটি">›</button></div></div>
+        <blockquote id="jText"></blockquote><cite id="jRef"></cite></div>
+      <div class="card jlist" id="jList" hidden><div class="h">জুমু'আর আমল <small id="jCount"></small></div><div class="jbar"><i id="jBar"></i></div><div class="items" id="jItems"></div></div>
+      <div class="fast" id="fastCard" hidden><b id="fastT"></b><p id="fastP"></p><div class="acts"><button type="button" id="fastDone" aria-pressed="false" hidden>রোজা রেখেছি ✓</button></div></div>
+      <div class="moti" aria-live="polite"><span class="mi" id="mIcon">🌙</span><div><b id="mTitle"></b><p id="mBody"></p></div></div>
+      <div class="card"><div class="h">এই সপ্তাহ <small id="streakLbl"></small></div><div class="week" id="week"></div></div>
+      <div class="cont"><div class="t"><small>এখন পড়ছেন</small><b id="cName"></b><small id="cCount"></small><span class="ctag" id="cTag">🌙 <span id="dLbl">মাগরিব পর্যন্ত</span> <b class="num" id="dLeft">--:--:--</b></span><button class="pill" data-go="tasbih">চালিয়ে যান →</button></div><img src="dome.jpg" alt=""></div>
+      <div class="card"><div class="h">আজকের হিসাব <small>দুরুদ অনুযায়ী</small></div><div class="rows" id="todayRows"></div></div>
+      <div class="card scard"><div class="h"><span style="color:var(--accent)">✦ টুকরো টুকরো নবী প্রেম</span><small id="sNo"></small></div>
+        <b id="sTitle" style="display:block;margin-top:8px;font-size:16px;color:var(--g)"></b><p class="prev" id="sPrev"></p>
+        <button class="btn" type="button" id="sOpen">পুরোটা পড়ুন →</button></div>
+      <div class="card faz"><div class="h"><span style="color:var(--accent)">✦ আজকের ফজিলত</span><div class="nav2"><button type="button" id="fazPrev" aria-label="আগেরটি">‹</button><button type="button" id="fazNext" aria-label="পরেরটি">›</button></div></div>
+        <blockquote id="fazText"></blockquote><cite id="fazRef"></cite></div>
+    </div>
+  </section>
+
+  <!-- DURUD -->
+  <section class="view" id="v-durud" hidden>
+    <div class="pagehead pad"><h2>দুরুদ</h2><button class="iconbtn" data-open="settings" aria-label="সেটিংস"><svg><use href="#i-set"/></svg></button></div>
+    <div class="pad" style="margin-bottom:12px"><div class="seg" role="group" aria-label="অংশ" id="dSeg"><button type="button" data-s="list" aria-pressed="true">দুরুদসমূহ</button><button type="button" data-s="story" aria-pressed="false">টুকরো টুকরো নবী প্রেম</button></div></div>
+    <div class="pad stack" id="durudList">
+      <article class="card fazread" id="fazRead">
+        <h3>দরূদ ও সালাম: উপকারিতা ও ফযীলত</h3>
+        <div class="fr-body">
+          <p>হযরত মুহাম্মাদ (ﷺ) আল্লাহ তা‘আলার আখেরী রাসূল। তাই তাঁর প্রতি বিশ্বাস ও আনুগত্য ছাড়া আল্লাহকে বিশ্বাস ও আল্লাহর আনুগত্যের দাবি অর্থহীন। কুরআন কারীমের বিভিন্ন জায়গায় এ বিষয়টি ঘোষিত হয়েছে। আল্লাহ তাআলাকে পাওয়ার একমাত্র পথ হযরত মুহাম্মাদ (ﷺ)-এর অনুসরণ। তাই তাঁর জন্য হৃদয়ের গভীরে মহব্বত ও ভালবাসা পোষণ করা এবং দু‘আ করা প্রত্যেক উম্মতের ঈমানী কর্তব্য।</p>
+          <p>কুরআন মাজীদে আল্লাহ তা‘আলা নবী (ﷺ)-এর জন্য দরূদ পাঠের আদেশ করেছেন। এটা একদিকে যেমন আল্লাহর কাছে তাঁর রাসূলের মর্যাদার প্রমাণ, অন্যদিকে মুমিন বান্দার রহমত ও বরকত লাভের অন্যতম উপায়। আল্লাহ তা‘আলা ইরশাদ করেন,</p>
+          <p class="ar fr-ayah">إِنَّ اللّٰهَ وَمَلَآئِكَتَهٗ يُصَلُّوْنَ عَلَى النَّبِيِّ يٰٓأَيُّهَا الَّذِيْنَ اٰمَنُوْا صَلُّوْا عَلَيْهِ وَسَلِّمُوْا تَسْلِيْمًا</p>
+          <p><b>অর্থ:</b> নিশ্চয়ই আল্লাহ ও তাঁর ফেরেশতাগণ নবীর প্রতি দরূদ পাঠান। হে মুমিনগণ! তোমরাও তার প্রতি দরূদ পাঠাও এবং অধিক পরিমাণে সালাম পাঠাও। <span class="ref" style="display:inline">[সূরা আল-আহযাব ৩৩:৫৬]</span></p>
+        </div>
+        <button class="btn ghost" type="button" id="frToggle" aria-expanded="false">পুরোটা পড়ুন ›</button>
+      </article>
+    </div>
+    <div class="pad stack" id="storyList" hidden></div>
+  </section>
+
+  <!-- SUNNAH REVIVAL -->
+  <section class="view" id="v-sunnah" hidden>
+    <div class="pagehead pad"><h2>সুন্নাহ রিভাইভাল</h2><button class="iconbtn" data-open="settings" aria-label="সেটিংস"><svg><use href="#i-set"/></svg></button></div>
+    <div class="pad stack">
+      <div class="sum">
+        <div class="ring2"><svg viewBox="0 0 78 78" aria-hidden="true"><circle cx="39" cy="39" r="32" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="8"/><circle id="suArc" cx="39" cy="39" r="32" fill="none" stroke="#e8c873" stroke-width="8" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="201"/></svg><b class="num" id="suDone">০/৫</b></div>
+        <div><strong>নিত্যদিনের সুন্নাহ</strong><p id="suSub"></p></div>
+      </div>
+      <div class="card"><div class="h">নিত্যদিনের সুন্নাহ <small>এই সপ্তাহ</small></div><div class="smain" id="suMain"></div></div>
+      <div class="card more"><div class="h">আরো সুন্নাহ <small>ইচ্ছেমতো</small></div>
+        <div class="chips" id="suCats" style="margin:10px 0 4px"></div><div id="suMore"></div></div>
+    </div>
+  </section>
+
+  <!-- HISTORY -->
+  <section class="view" id="v-history" hidden>
+    <div class="pagehead pad"><h2>অগ্রগতি</h2><button class="iconbtn" data-open="settings" aria-label="সেটিংস"><svg><use href="#i-set"/></svg></button></div>
+    <div class="pad stack">
+      <div class="card ach">
+        <div class="h">Achievement <small id="medalHint"></small></div>
+        <div class="achrow">
+          <div class="ring sm"><svg viewBox="0 0 140 140" aria-hidden="true"><circle cx="70" cy="70" r="60" fill="none" style="stroke:var(--gl)" stroke-width="14"/><circle id="ringArc" cx="70" cy="70" r="60" fill="none" style="stroke:var(--g)" stroke-width="14" stroke-linecap="round" stroke-dasharray="377" stroke-dashoffset="377"/></svg>
+            <div class="c"><div class="pct num" id="pct">০%</div></div></div>
+          <div class="medals" id="medals"></div>
+        </div>
+        <div class="stats4">
+          <div><b class="num" id="sTotal">০</b><span>মোট পড়া</span></div>
+          <div><b class="num" id="sLeft">০</b><span>বাকি</span></div>
+          <div><b class="num" id="sDay">১</b><span id="sDayL">দিন চলছে</span></div>
+          <div><b class="num" id="sStreak">০</b><span>টানা পূর্ণ দিন</span></div>
+        </div>
+        <button class="btn ghost" type="button" id="mapToggle" aria-expanded="false" aria-controls="mapCard" style="align-self:flex-start;margin-top:4px">দিনের মানচিত্র দেখুন ›</button>
+      </div>
+      <div class="card" id="mapCard" hidden><div class="h"><span id="gridLbl">দিনের মানচিত্র</span><div class="pager" id="pager" hidden><button type="button" id="pgPrev" aria-label="আগের ১০০ দিন">‹</button><button type="button" id="pgNext" aria-label="পরের ১০০ দিন">›</button></div></div>
+        <div class="grid" id="grid"></div>
+        <div class="legend"><span><i style="background:var(--gl)"></i>পড়া হয়নি</span><span><i style="background:color-mix(in srgb,var(--g) 45%,var(--gl))"></i>আংশিক</span><span><i style="background:var(--g)"></i><span id="fullLbl">লক্ষ্য পূর্ণ</span></span></div>
+      </div>
+      <div class="seg" role="group" aria-label="সময়কাল" id="hSeg"><button type="button" data-r="7" aria-pressed="true">৭ দিন</button><button type="button" data-r="30" aria-pressed="false">৩০ দিন</button><button type="button" data-r="all" aria-pressed="false">সব</button></div>
+      <div class="tiles"><div class="tile"><b class="num" id="tTot">০</b><span id="tTotL">এই ৭ দিনে</span></div><div class="tile"><b class="num" id="tAvg">০</b><span>দৈনিক গড়</span></div><div class="tile"><b class="num" id="tBest">০</b><span>সেরা দিন</span></div></div>
+      <div class="card chart"><div class="h"><span id="chTitle">প্রতিদিন কত বার</span><small id="chGoal"></small></div><svg id="chart" viewBox="0 0 320 210" role="img" aria-label="বার-চার্ট"></svg><div class="leg" id="legend"></div></div>
+      <div class="h" style="padding:0 2px">দিনভিত্তিক হিসাব <small>ট্যাপ করে সংখ্যা ঠিক করুন</small></div>
+      <div class="list" id="dayList"></div>
+    </div>
+  </section>
+
+
+</div>
+
+<!-- TASBIH -->
+<section id="v-tasbih" hidden aria-label="তাসবিহ">
+  <div class="tin">
+    <div class="tb">
+      <button class="iconbtn" id="tBack" aria-label="ফিরে যান"><svg><use href="#i-back"/></svg></button>
+      <div class="selwrap"><select id="tSel" aria-label="দুরুদ বেছে নিন"></select></div>
+      <div style="display:flex;gap:8px"><button class="iconbtn" id="tPlay" aria-label="উচ্চারণ শুনুন" hidden><svg><use href="#i-play"/></svg></button>
+      <button class="iconbtn" id="tSound" aria-label="শব্দ" aria-pressed="false"><svg><use href="#i-mute"/></svg></button></div>
+    </div>
+    <div class="jtag" id="jTag" hidden>জুমু'আর দিন · বেশি বেশি দুরুদ পড়ি</div>
+    <p class="tar ar" id="tAr"></p>
+    <div class="ringwrap"><div class="bring" id="bring"><svg viewBox="0 0 250 250" id="beads" aria-hidden="true"></svg>
+      <div class="c"><div class="n num" id="tN">০</div><div class="s" id="tS"></div></div></div></div>
+    <div class="tot"><span>আজ মোট: <b class="num" id="tTotal">০</b></span><span>লক্ষ্য: <b class="num" id="tGoal">০</b></span></div>
+    <div class="tchips"><button class="tchip" data-add="10">+১০</button><button class="tchip" data-add="33">+৩৩</button><button class="tchip" data-add="100">+১০০</button><button class="tchip" data-add="-1">−১</button><button class="tchip" id="tEdit" aria-label="সংখ্যা লিখুন"><svg width="16" height="16" style="vertical-align:-3px"><use href="#i-edit"/></svg></button></div>
+    <div class="hint">স্ক্রিনের যেকোনো জায়গায় ট্যাপ করুন · স্ক্রিন বন্ধ হবে না</div>
+  </div>
+</section>
+
+<nav class="bnav" aria-label="প্রধান মেনু">
+  <button class="navbtn" data-go="home" aria-current="page"><svg><use href="#i-home"/></svg><span>হোম</span></button>
+  <button class="navbtn" data-go="durud"><svg><use href="#i-book"/></svg><span>দুরুদ</span></button>
+  <button class="fab" data-go="tasbih" aria-label="তাসবিহ — গোনা শুরু করুন"><svg><use href="#i-beads"/></svg></button>
+  <button class="navbtn" data-go="history"><svg><use href="#i-chart"/></svg><span>অগ্রগতি</span></button>
+  <button class="navbtn" data-go="sunnah"><svg><use href="#i-seed"/></svg><span>সুন্নাহ</span></button>
+</nav>
+
+<!-- settings sheet -->
+<div class="modal sheet" id="settings" hidden role="dialog" aria-modal="true" aria-labelledby="setT">
+  <div class="mcard">
+    <h2 id="setT">সেটিংস</h2>
+    <div class="field"><span>Theme</span><div class="themes" id="themes">
+      <button class="sw" type="button" data-theme="mint"><i style="background:linear-gradient(135deg,#eaf4ee 50%,#1d6b44 50%)"></i>হালকা সবুজ</button>
+      <button class="sw" type="button" data-theme="deep"><i style="background:linear-gradient(135deg,#0a261c 50%,#d6b25e 50%)"></i>গাঢ় সবুজ</button>
+      <button class="sw" type="button" data-theme="light"><i style="background:linear-gradient(135deg,#fffdf7 50%,#a8801f 50%)"></i>লাইট</button>
+      <button class="sw" type="button" data-theme="dark"><i style="background:linear-gradient(135deg,#0f1211 50%,#d4af5a 50%)"></i>ডার্ক</button>
+    </div></div>
+    <hr class="sep">
+    <div class="field"><span>প্রতিদিনের লক্ষ্য</span><div class="chips" id="dailyChips"></div><input class="inp num" type="number" id="dailyIn" min="1" inputmode="numeric" aria-label="প্রতিদিনের লক্ষ্য, নিজে লিখুন"></div>
+    <div class="field"><span>মোট লক্ষ্য</span><div class="chips" id="goalChips"></div><input class="inp num" type="number" id="goalIn" min="1" inputmode="numeric" aria-label="মোট লক্ষ্য, নিজে লিখুন"></div>
+    <div class="field"><span>মাগরিবের সময়</span>
+      <div class="mgbox"><b id="mgNow">—</b><small id="mgMode"></small></div>
+      <div class="chips"><button class="btn" type="button" id="locBtn">📍 আমার এলাকা থেকে বের করুন</button><button class="btn ghost" type="button" id="locOff" hidden>নিজে লিখব</button></div>
+      <small id="locMsg" style="color:var(--muted)"></small>
+      <label class="rowline" id="mgManual"><span>নিজে সময় লিখুন</span><input class="inp" type="time" id="maghribIn" style="max-width:140px"></label>
+    </div>
+    <div class="field"><span>নতুন দিন শুরু হবে</span><div class="chips" id="dayModeChips"><button class="chip" type="button" data-v="maghrib">মাগরিব থেকে</button><button class="chip" type="button" data-v="midnight">রাত ১২টা থেকে</button></div>
+      <small style="color:var(--muted)">মাগরিব থেকে: মাগরিবের পর পড়া দুরুদ পরের দিনের হিসাবে যোগ হবে, যেমন ইসলামি দিন গোনা হয়।</small></div>
+    <div class="field"><span>হিজরি তারিখ</span><div class="chips" id="hijChips"><button class="chip" type="button" data-v="-2">−২</button><button class="chip" type="button" data-v="-1">−১ (বাংলাদেশ)</button><button class="chip" type="button" data-v="0">০ (সৌদি)</button><button class="chip" type="button" data-v="1">+১</button></div>
+      <small style="color:var(--muted)" id="hijNow"></small></div>
+    <label class="rowline"><span style="font-weight:600">শুরুর তারিখ</span><input class="inp" type="date" id="startIn"></label>
+    <div class="rowline"><span style="font-weight:600">তাসবিহে শব্দ</span><button class="toggle" type="button" id="soundT" aria-pressed="false" aria-label="তাসবিহে শব্দ"></button></div>
+    <div class="rowline"><span style="font-weight:600">তাসবিহে কম্পন</span><button class="toggle" type="button" id="vibT" aria-pressed="true" aria-label="তাসবিহে কম্পন"></button></div>
+    <hr class="sep">
+    <div class="rowline"><button class="btn ghost" id="resetBtn" type="button">সব মুছে নতুন করে শুরু</button>
+      <span id="resetConfirm" hidden>নিশ্চিত? <button class="btn" id="resetYes" type="button">হ্যাঁ, মুছুন</button> <button class="btn ghost" id="resetNo" type="button">না</button></span></div>
+    <div class="btnrow"><button class="btn primary" type="button" data-close>ঠিক আছে</button></div>
+  </div>
+</div>
+
+<!-- edit day sheet -->
+<div class="modal sheet" id="editor" hidden role="dialog" aria-modal="true" aria-labelledby="edT">
+  <div class="mcard">
+    <h2 id="edT">সংখ্যা ঠিক করুন</h2>
+    <p class="center" style="color:var(--muted);font-size:14px" id="edSub"></p>
+    <div class="stack" id="edRows" style="gap:10px"></div>
+    <div class="rowline" style="font-weight:700"><span>মোট</span><span class="num" id="edTot">০</span></div>
+    <div class="btnrow"><button class="btn ghost" type="button" data-close>বাতিল</button><button class="btn primary" type="button" id="edSave">সংরক্ষণ</button></div>
+  </div>
+</div>
+
+<!-- first run -->
+<div class="modal" id="setup" hidden role="dialog" aria-modal="true" aria-labelledby="suT">
+  <div class="mcard">
+    <h2 id="suT" class="salam2">السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللّٰهِ وَبَرَكَاتُهُ</h2>
+    <p class="center" style="color:var(--muted)">নিজের মতো করে লক্ষ্য ঠিক করে নিন। পরে সেটিংস থেকে বদলানো যাবে।</p>
+    <div class="field"><span>প্রতিদিন কত বার?</span><div class="chips" id="suDaily"></div></div>
+    <div class="field"><span>মোট লক্ষ্য</span><div class="chips" id="suGoal"></div></div>
+    <button class="btn primary" id="suGo" type="button" style="align-self:center">বিসমিল্লাহ, শুরু করি</button>
+  </div>
+</div>
+
+<!-- medal -->
+<div class="modal" id="medalModal" hidden role="dialog" aria-modal="true" aria-labelledby="mdT">
+  <div class="mcard center" style="align-items:center">
+    <div class="medalbig" id="mdIcon"></div>
+    <h2 id="mdT"></h2>
+    <p id="mdText" style="color:var(--muted)"></p>
+    <button class="btn primary" type="button" data-close>আলহামদুলিল্লাহ</button>
+  </div>
+</div>
+
+<div id="toast" hidden role="status"></div>
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<script>
+(function(){
+  "use strict";
+  /* ---------- helpers ---------- */
+  const BN="০১২৩৪৫৬৭৮৯";
+  const bn=n=>String(n).replace(/\d/g,d=>BN[d]);
+  const fmt=n=>bn(Math.round(n).toLocaleString("en-IN"));
+  const iso=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  const parse=s=>{const[y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)};
+  const addDays=(s,n)=>{const d=parse(s);d.setDate(d.getDate()+n);return iso(d)};
+  const diff=(a,b)=>Math.round((parse(b)-parse(a))/864e5);
+  const realToday=()=>iso(new Date());
+  const MONTHS=["জানু","ফেব্রু","মার্চ","এপ্রি","মে","জুন","জুলাই","আগ","সেপ্টে","অক্টো","নভে","ডিসে"];
+  const WD=["রবি","সোম","মঙ্গল","বুধ","বৃহঃ","শুক্র","শনি"];
+  const WDF=["রবিবার","সোমবার","মঙ্গলবার","বুধবার","বৃহস্পতিবার","শুক্রবার","শনিবার"];
+  const pretty=s=>{const d=parse(s);return bn(d.getDate())+" "+MONTHS[d.getMonth()]};
+  const prettyW=s=>WD[parse(s).getDay()]+", "+pretty(s);
+  const $=id=>document.getElementById(id);
+  const ls={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+  let maghrib=ls.get("durud-maghrib")||"18:00";
+  let loc=null; try{const l=JSON.parse(ls.get("durud-loc")||"null");if(l&&isFinite(l.lat)&&isFinite(l.lng))loc=l}catch(e){}
+  /* sunset (NOAA sunrise/sunset algorithm, zenith 90.833°) → minutes after local midnight */
+  function sunsetMins(date,lat,lng){
+    const rad=Math.PI/180,start=new Date(date.getFullYear(),0,0),N=Math.floor((new Date(date.getFullYear(),date.getMonth(),date.getDate())-start)/864e5);
+    const lh=lng/15,t=N+((18-lh)/24),M=0.9856*t-3.289;
+    let L=(M+1.916*Math.sin(M*rad)+0.020*Math.sin(2*M*rad)+282.634+720)%360;
+    let RA=(Math.atan(0.91764*Math.tan(L*rad))/rad+720)%360;
+    RA=(RA+(Math.floor(L/90)*90-Math.floor(RA/90)*90))/15;
+    const sd=0.39782*Math.sin(L*rad),cd=Math.cos(Math.asin(sd));
+    const cosH=(Math.cos(90.833*rad)-sd*Math.sin(lat*rad))/(cd*Math.cos(lat*rad));
+    if(cosH<-1||cosH>1)return null;
+    const H=Math.acos(cosH)/rad/15,T=H+RA-0.06571*t-6.622;
+    let UT=((T-lh)%24+24)%24;
+    const local=((UT-new Date(date.getFullYear(),date.getMonth(),date.getDate(),12).getTimezoneOffset()/60)%24+24)%24;
+    return Math.round(local*60);
+  }
+  function maghribMins(date){
+    if(loc){const m=sunsetMins(date,loc.lat,loc.lng);if(m!=null)return m}
+    const [h,m]=maghrib.split(":").map(Number);return h*60+(m||0);
+  }
+
+  /* ---------- the app's day: from maghrib to maghrib (default) or midnight to midnight ---------- */
+  let dayMode=ls.get("durud-daymode")||"maghrib";
+  const afterMaghrib=(now)=>{now=now||new Date();return now.getHours()*60+now.getMinutes()>=maghribMins(now)};
+  const todayStr=()=>{const n=new Date();return (dayMode==="maghrib"&&afterMaghrib(n))?addDays(iso(n),1):iso(n)};
+  /* ---------- Hijri date (Umm al-Qura, shifted for local moon sighting; Bangladesh = −1) ---------- */
+  let hijAdj=parseInt(ls.get("durud-hijadj")??"-1",10); if(isNaN(hijAdj))hijAdj=-1;
+  const HMONTH=["মুহাররম","সফর","রবিউল আউয়াল","রবিউস সানি","জুমাদাল উলা","জুমাদাস সানি","রজব","শা'বান","রমাদান","শাওয়াল","যিলক্বদ","যিলহজ্জ্ব"];
+  let hijFmt=null; try{hijFmt=new Intl.DateTimeFormat("en-u-ca-islamic-umalqura",{day:"numeric",month:"numeric",year:"numeric"})}catch(e){}
+  function hijri(ds){
+    if(!hijFmt)return null;
+    const d=parse(ds);d.setHours(12);d.setDate(d.getDate()+hijAdj);
+    const o={};hijFmt.formatToParts(d).forEach(p=>{o[p.type]=p.value});
+    const m=parseInt(o.month,10),dd=parseInt(o.day,10),y=parseInt(o.year,10);
+    if(!m||!dd)return null;return{d:dd,m,y,txt:bn(dd)+" "+HMONTH[m-1]+" "+bn(y)};
+  }
+
+  /* ---------- durud data ---------- */
+  const DURUD=[
+    {id:"chhoto",name:"ছোট দুরুদ",short:"ছোট",title:"সবচেয়ে ছোট বিশুদ্ধ দুরুদ",
+     ar:"اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ وَعَلٰى آلِ مُحَمَّدٍ",
+     mean:"হে আল্লহ! আপনি মুহাম্মাদ এবং মুহাম্মাদের পরিবারের উপর রহমত বর্ষণ করুন।",
+     faz:"রসূলুল্লহ ﷺ বলেন, “তোমরা আমার প্রতি দুরুদ পড়ো এবং সাধ্যানুযায়ী দু'আ করো ও বলো (উপরের দুরুদটি)।”",
+     ref:"[ইমাম নাসায়ি, আস-সুনান: ১২৯১; হাদিসটি সহিহ]"},
+    {id:"ibrahim",name:"দুরুদে ইব্রাহিম",short:"ইব্রাহিম",title:"দুরুদে ইব্রাহিম — শ্রেষ্ঠতম মানুষ সমীপে সর্বশ্রেষ্ঠ দুরুদ",
+     ar:"اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ وَعَلٰى آلِ مُحَمَّدٍ كَمَا صَلَّيْتَ عَلٰى إِبْرَاهِيْمَ وَعَلٰى آلِ إِبْرَاهِيْمَ إِنَّكَ حَمِيْدٌ مَجِيْدٌ اَللّٰهُمَّ بَارِكْ عَلٰى مُحَمَّدٍ وَعَلٰى آلِ مُحَمَّدٍ كَمَا بَارَكْتَ عَلٰى إِبْرَاهِيْمَ وَعَلٰى آلِ إِبْرَاهِيْمَ إِنَّكَ حَمِيْدٌ مَجِيْدٌ",
+     mean:"হে আল্লহ! আপনি মুহাম্মাদ ﷺ ও তাঁর পরিবারবর্গের প্রতি রহমত বর্ষণ করুন, যেভাবে রহমত বর্ষণ করেছেন ইব্রাহিম (আ.) ও তাঁর পরিবারবর্গের প্রতি; নিশ্চয়ই আপনি প্রশংসিত ও সম্মানিত। হে আল্লহ! আপনি মুহাম্মাদ ﷺ ও তাঁর পরিবারবর্গের প্রতি বরকত নাযিল করুন, যেভাবে বরকত নাযিল করেছেন ইব্রাহিম (আ.) ও তাঁর পরিবারবর্গের প্রতি; নিশ্চয়ই আপনি প্রশংসিত ও সম্মানিত।",
+     faz:"সাহাবিরা জিজ্ঞেস করলেন, আমরা আপনার উপর কীভাবে দুরুদ পাঠ করব? তখন রসূলুল্লহ ﷺ এই দুরুদটি শিখিয়ে দিলেন।",
+     ref:"[সহিহ বুখারি: ৩৩৭০; সহিহ মুসলিম: ৪০৬]"},
+    {id:"muhammad",name:"দরূদে মুহাম্মাদ ﷺ",short:"মুহাম্মাদ ﷺ",title:"দরূদে মুহাম্মাদ ﷺ",
+     ar:"اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ عَبْدِكَ وَرَسُوْلِكَ كَمَا صَلَّيْتَ عَلٰى إِبْرَاهِيْمَ وَبَارِكْ عَلٰى مُحَمَّدٍ وَعَلٰى آلِ مُحَمَّدٍ كَمَا بَارَكْتَ عَلٰى إِبْرَاهِيْمَ وَآلِ إِبْرَاهِيْمَ",
+     mean:"ইয়া আল্লাহ! রহমত বর্ষণ করুন আপনার বান্দা ও রাসূল মুহাম্মাদ ﷺ-এর উপর, যেমন রহমত বর্ষণ করেছেন ইবরাহীম আ.-এর উপর। এবং বরকত নাযিল করুন মুহাম্মাদ ﷺ-এর উপর ও তাঁর পরিবারবর্গের উপর, যেমনিভাবে বরকত নাযিল করেছেন ইবরাহীম আ. ও তাঁর পরিবারবর্গের উপর।",
+     faz:"আবু সাঈদ খুদরি (রা.) বলেন, আমরা বললাম, হে আল্লাহর রাসূল! আপনাকে সালাম দেওয়ার পদ্ধতি তো জানলাম, কিন্তু আপনার উপর সালাত (দরূদ) কীভাবে পাঠ করব? তিনি বললেন, তোমরা বলো: (উপরের দরূদটি)।",
+     ref:"[সহিহ বুখারি: ৬৩৫৮]"},
+    {id:"sadaqah",name:"সাদাকাহ'র দুরুদ",short:"সাদাকাহ",title:"যে দুরুদে আছে সাদাকাহ'র সওয়াব",
+     ar:"اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ عَبْدِكَ وَرَسُوْلِكَ وَصَلِّ عَلَى الْمُؤْمِنِيْنَ وَالْمُؤْمِنَاتِ وَالْمُسْلِمِيْنَ وَالْمُسْلِمَاتِ",
+     mean:"হে আল্লহ! আপনি আপনার বান্দা ও রসূল মুহাম্মাদের উপর রহমত বর্ষণ করুন এবং সকল মু'মিন-মু'মিনা ও মুসলিম-মুসলিমার উপরও রহমত বর্ষণ করুন!",
+     faz:"আল্লহ'র রসূল ﷺ বলেন, “যে মুসলমানের দান-সাদাকাহ করার মতো কিছু নেই, সে যেন দু'আ করার সময় এটি বলে। এটি তার জন্য যাকাতস্বরূপ।”",
+     ref:"[ইমাম ইবনু হিব্বান, আস-সহিহ: ৯০৩; সনদ হাসান]"},
+    {id:"shafaat",name:"শাফা'আতের দুরুদ",short:"শাফা'আত",title:"নবীজী ﷺ-এর শাফা'আত লাভের দুরুদ",
+     ar:"اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ وَأَنْزِلْهُ الْمَقْعَدَ الْمُقَرَّبَ عِنْدَكَ يَوْمَ الْقِيَامَةِ",
+     mean:"হে আল্লহ! আপনি মুহাম্মাদের উপর রহমত বর্ষণ করুন এবং কিয়ামতের দিন আপনার নিকটেই তাঁকে স্থান দিন!",
+     faz:"রসূলুল্লহ ﷺ বলেন, “যে এটি বলবে, তার জন্য আমার সুপারিশ ওয়াজিব হয়ে যাবে।”",
+     ref:"[ইমাম তাবারানি, আল-মু'জামুল কাবির: ৪৪৮০; ইমাম হাইসামি, মাজমাউয যাওয়াইদ: ১৭৩০৪]"},
+    {id:"ahlebayt",name:"নবী-পরিবারসহ দরূদ",short:"নবী-পরিবার",title:"উম্মাহাতুল মু'মিনীন ও নবী-পরিবারসহ দরূদ",
+     ar:"اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدِنِ النَّبِيِّ وَأَزْوَاجِهٖ أُمَّهَاتِ الْمُؤْمِنِيْنَ وَذُرِّيَّتِهٖ وَأَهْلِ بَيْتِهٖ كَمَا صَلَّيْتَ عَلٰى آلِ إِبْرَاهِيْمَ إِنَّكَ حَمِيْدٌ مَّجِيْدٌ",
+     mean:"ইয়া আল্লাহ! নবী মুহাম্মাদ ﷺ-এর প্রতি রহমত বর্ষণ করুন এবং তাঁর স্ত্রীগণ-উম্মাহাতুল মুমিনীনের উপর, তাঁর সন্তান-সন্ততি ও নিকটাত্মীয়দের প্রতিও; যেমন রহমত বর্ষণ করেছেন ইবরাহীম আ.-এর পরিজনদের প্রতি। আপনি নিশ্চয়ই অতি প্রশংসনীয়, মহা মহীয়ান।",
+     faz:"আবু হুরায়রা (রা.) থেকে বর্ণিত, নবীজী ﷺ বলেছেন: যে ব্যক্তি চায় যে আমাদের পরিবারের উপর দরূদ পাঠ করলে তাকে পূর্ণ পাল্লায় মেপে (প্রতিদান) দেওয়া হোক, সে যেন বলে: (উপরের দরূদটি)।",
+     ref:"[সুনান আবু দাউদ: ৯৮২; সনদ নিয়ে মুহাদ্দিসদের মতভেদ আছে]"},
+    {id:"ibnmasud",name:"ইবন মাস'উদ (রা.)-এর দরূদ",short:"ইবন মাস'উদ",title:"আব্দুল্লাহ ইবন মাস'উদ (রা.)-এর শেখানো দরূদ",
+     ar:"اَللّٰهُمَّ اجْعَلْ صَلَاتَكَ وَرَحْمَتَكَ وَبَرَكَاتِكَ عَلٰى سَيِّدِ الْمُرْسَلِيْنَ وَإِمَامِ الْمُتَّقِيْنَ وَخَاتَمِ النَّبِيِّيْنَ مُحَمَّدٍ عَبْدِكَ وَرَسُوْلِكَ إِمَامِ الْخَيْرِ وَقَائِدِ الْخَيْرِ وَرَسُوْلِ الرَّحْمَةِ اَللّٰهُمَّ ابْعَثْهُ مَقَامًا مَحْمُوْدًا يَغْبِطُهُ بِهِ الْأَوَّلُوْنَ وَالْآخِرُوْنَ اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ وَعَلٰى آلِ مُحَمَّدٍ كَمَا صَلَّيْتَ عَلٰى إِبْرَاهِيْمَ وَعَلٰى آلِ إِبْرَاهِيْمَ إِنَّكَ حَمِيْدٌ مَجِيْدٌ اَللّٰهُمَّ بَارِكْ عَلٰى مُحَمَّدٍ وَعَلٰى آلِ مُحَمَّدٍ كَمَا بَارَكْتَ عَلٰى إِبْرَاهِيْمَ وَعَلٰى آلِ إِبْرَاهِيْمَ إِنَّكَ حَمِيْدٌ مَجِيْدٌ",
+     mean:"হে আল্লাহ! আপনি আপনার প্রশান্তি, আপনার রহমত ও বরকত আপনার বান্দা ও রাসূল, রাসূলকুলের শিরোমণি, মুত্তাকীগণের ইমাম, সর্বশেষ নবী, কল্যাণ ও মঙ্গলের ইমাম, রহমতের রাসূল মুহাম্মাদ ﷺ-এর প্রতি নাযিল করুন। হে আল্লাহ! আপনি তাঁকে মাকামে মাহমুদে পৌঁছে দিন, যার জন্য পূর্ববর্তী ও পরবর্তীগণ আকাঙ্ক্ষা করে থাকেন। হে আল্লাহ! আপনি মুহাম্মাদ ﷺ এবং তাঁর বংশধরদের উপর রহমত নাযিল করুন, যেরূপ রহমত নাযিল করেছেন ইবরাহীম আ. ও তাঁর বংশধরদের উপর। নিশ্চয়ই আপনি প্রশংসিত, মহিমান্বিত। হে আল্লাহ! আপনি মুহাম্মাদ ﷺ ও তাঁর বংশধরদের উপর বরকত দান করুন, যেরূপ বরকত দান করেছেন ইবরাহীম আ. ও তাঁর বংশধরদের প্রতি। নিশ্চয়ই আপনি প্রশংসিত, গৌরবান্বিত।",
+     faz:"আব্দুল্লাহ ইবন মাস'উদ (রা.) বলেন: যখন তোমরা রাসূলুল্লাহ ﷺ-এর উপর দরূদ পাঠ করবে, তখন সুন্দরভাবে পাঠ করো; কেননা তোমরা জানো না, হয়তো তা তাঁর কাছে পেশ করা হয়। তারপর তিনি এই দরূদটি শিখিয়ে দিলেন।",
+     ref:"[সুনান ইবন মাজাহ: ৯০৬; সাহাবির নিজের কথা, সনদ দুর্বল বলে অনেকে মত দিয়েছেন]"},
+    {id:"sallallahu",name:"সংক্ষিপ্ত দরূদ (ﷺ)",short:"ﷺ",title:"সংক্ষিপ্ত দরূদ: সাল্লাল্লাহু আলাইহি ওয়াসাল্লাম",
+     ar:"صَلَّى اللّٰهُ عَلَيْهِ وَسَلَّمَ",
+     mean:"আল্লাহ তাঁর (মুহাম্মাদ ﷺ-এর) প্রতি রহমত বর্ষণ করুন এবং তাঁকে শান্তি দান করুন।",
+     faz:"নবীজী ﷺ বলেছেন: প্রকৃত কৃপণ সেই ব্যক্তি, যার সামনে আমার নাম উচ্চারিত হলো, অথচ সে আমার উপর দরূদ পাঠ করলো না। তাই নবীজী ﷺ-এর নাম শুনলে বা বললে এই ছোট দরূদটি পড়া উচিত।",
+     ref:"[জামে আত-তিরমিযি: ৩৫৪৬]"}
+  ];
+  const DBY=Object.fromEntries(DURUD.map(d=>[d.id,d]));
+  const RANKCOL=["--d1","--d2","--d3","--d4"];
+  function topIds(){const t={};DURUD.forEach(x=>t[x.id]=0);for(const k in state.days){const o=state.days[k];for(const id in o)if(id in t)t[id]+=o[id]||0}
+    const order=["ibrahim","chhoto","sadaqah","shafaat"];
+    return DURUD.map(x=>x.id).sort((a,b)=>(t[b]-t[a])||(order.indexOf(a)===-1?9:order.indexOf(a))-(order.indexOf(b)===-1?9:order.indexOf(b))).slice(0,4)}
+  const colOf=id=>{const i=topIds().indexOf(id);return i>=0?RANKCOL[i]:"--d5"};
+
+  /* ---------- state (with migration from the single-count version) ---------- */
+  const LS="durud-lakh-v1";
+  let state=null, firstRun=true;
+  try{const s=JSON.parse(ls.get(LS)||"null");if(s&&s.start){state=s;firstRun=false}}catch(e){}
+  if(!state)state={start:todayStr(),daily:1000,goal:100000,days:{},medals:[]};
+  state.days=state.days||{};
+  for(const k of Object.keys(state.days)){
+    const v=state.days[k];
+    if(typeof v==="number"){ if(v>0)state.days[k]={ibrahim:v}; else delete state.days[k]; }
+    else if(!v||typeof v!=="object")delete state.days[k];
+  }
+  state.medals=state.medals||[]; if(!DBY[state.cur])state.cur="ibrahim"; state.v=2; delete state.name;
+
+  const dayObj=ds=>state.days[ds]||{};
+  const dayTotal=ds=>{const o=state.days[ds];if(!o)return 0;let t=0;for(const k in o)t+=o[k]||0;return t};
+  const total=()=>{let t=0;for(const k in state.days)t+=dayTotal(k);return t};
+  const nDays=()=>Math.max(1,Math.ceil(state.goal/state.daily));
+  function streak(){
+    const td=todayStr(),d=state.daily;let s=0,cur=dayTotal(td)>=d?td:addDays(td,-1);
+    while(diff(state.start,cur)>=0&&dayTotal(cur)>=d){s++;cur=addDays(cur,-1)}return s;
+  }
+  function persist(){ls.set(LS,JSON.stringify(state))}
+
+  /* ---------- view switching ---------- */
+  let view="home";
+  function showRaw(v){
+    view=v;
+    document.querySelectorAll(".app .view").forEach(el=>el.hidden=el.id!=="v-"+v);
+    $("v-tasbih").hidden=v!=="tasbih";
+    document.body.classList.toggle("tasbih-on",v==="tasbih");
+    document.querySelectorAll(".navbtn").forEach(b=>{if(b.dataset.go===v)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")});
+    setThemeColor();
+    if(v==="tasbih")wakeOn();else wakeOff();
+    if(typeof stopAudio==="function"&&playingId)stopAudio();
+    if(v!=="tasbih")window.scrollTo(0,0);
+    render();
+  }
+  function go(v){
+    if(v===view)return;
+    const inSub=history.state&&history.state.v;
+    if(v==="home"){ if(inSub){history.back();return} showRaw("home"); return; }
+    if(inSub)history.replaceState({v},""); else history.pushState({v},"");
+    showRaw(v);
+  }
+  window.addEventListener("popstate",e=>showRaw((e.state&&e.state.v)||"home"));
+  document.addEventListener("click",e=>{
+    const g=e.target.closest("[data-go]"); if(g){e.preventDefault();go(g.dataset.go);return}
+    const o=e.target.closest("[data-open]"); if(o){openSheet(o.dataset.open);return}
+    const c=e.target.closest("[data-close]"); if(c){closeModal(c.closest(".modal"));return}
+    if(e.target.classList&&e.target.classList.contains("modal")&&e.target.id!=="setup")closeModal(e.target);
+  });
+  function openSheet(id){ if(id==="settings")renderSettings(); $(id).hidden=false; }
+  function closeModal(m){ if(m)m.hidden=true; }
+  document.addEventListener("keydown",e=>{if(e.key==="Escape")document.querySelectorAll(".modal:not([hidden])").forEach(m=>{if(m.id!=="setup")m.hidden=true})});
+
+  /* ---------- counting ---------- */
+  function setCount(ds,id,v){
+    v=Math.max(0,Math.round(v)||0);
+    const o=state.days[ds]||(state.days[ds]={});
+    if(v)o[id]=v; else delete o[id];
+    if(!Object.keys(o).length)delete state.days[ds];
+  }
+  function afterChange(beforeToday){
+    const td=todayStr(),after=dayTotal(td),d=state.daily;
+    const done=beforeToday<d&&after>=d;
+    const won=checkMedals();
+    render(); persist();
+    if(won!=null)celebrateMedal(won);
+    else if(done){stars(2600);toast("মা শা আল্লহ! আজকের "+fmt(d)+" পূর্ণ হলো 🌿");if(view==="tasbih")feedback(true)}
+  }
+  function bump(delta){
+    const td=todayStr(),before=dayTotal(td),cur=dayObj(td)[state.cur]||0;
+    if(delta<0&&cur===0)return;
+    setCount(td,state.cur,cur+delta);
+    const now=dayObj(td)[state.cur]||0;
+    if(delta>0)feedback(now%33===0);
+    afterChange(before);
+    const n=$("tN");n.classList.remove("bump");void n.offsetWidth;n.classList.add("bump");
+  }
+
+  /* ---------- feedback: vibration + soft click ---------- */
+  let prefs={sound:ls.get("durud-sound")==="1",vib:ls.get("durud-vib")!=="0"};
+  let actx=null;
+  function feedback(strong){
+    if(prefs.vib&&navigator.vibrate){try{navigator.vibrate(strong?[40,40,40]:12)}catch(e){}}
+    if(prefs.sound){
+      try{
+        actx=actx||new (window.AudioContext||window.webkitAudioContext)();
+        const o=actx.createOscillator(),g=actx.createGain();
+        o.type="sine";o.frequency.value=strong?880:1500;
+        g.gain.setValueAtTime(.0001,actx.currentTime);g.gain.exponentialRampToValueAtTime(strong?.25:.12,actx.currentTime+.005);
+        g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+(strong?.25:.05));
+        o.connect(g).connect(actx.destination);o.start();o.stop(actx.currentTime+(strong?.26:.06));
+      }catch(e){}
+    }
+  }
+  /* keep screen on while counting */
+  let wl=null;
+  async function wakeOn(){try{if(navigator.wakeLock&&!wl){wl=await navigator.wakeLock.request("screen");wl.addEventListener("release",()=>{wl=null})}}catch(e){wl=null}}
+  function wakeOff(){try{if(wl)wl.release()}catch(e){}wl=null}
+  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"){if(view==="tasbih")wakeOn();render()}});
+
+  /* ---------- motivation ---------- */
+  const MOT={
+    start:[["🌙","বিসমিল্লাহ, আজকের সফর শুরু করি","প্রতিটা দুরুদের বিনিময়ে আল্লহ দশটি রহমত নাযিল করেন।"],
+           ["🌙","আজকের প্রথম দুরুদটা পড়ে ফেলি?","শুরুটাই সবচেয়ে কঠিন, একবার শুরু করলে বাকিটা সহজ।"],
+           ["🌙","প্রিয় নবীজী ﷺ-এর জন্য আজকের হাদিয়া","আপনার দুরুদ ফেরেশতারা তাঁর কাছে পৌঁছে দেন।"]],
+    missed:[["🌱","গতকাল বাদ গেছে, আজ আবার শুরু করি","আল্লহ সেই আমল ভালোবাসেন যা নিয়মিত করা হয়, তা অল্প হলেও।"],
+            ["🌱","নতুন দিন, নতুন সুযোগ","আজ থেকেই আবার ধারা শুরু হোক, ইন শা আল্লহ।"]],
+    early:[["📿","সুন্দর শুরু! চালিয়ে যান","আজ {t} বার হয়েছে, লক্ষ্য {d}।"],
+           ["📿","মা শা আল্লহ, সফর চলছে","আর {r} বার পড়লেই আজকের লক্ষ্য পূর্ণ।"],
+           ["📿","প্রতিটা দুরুদই মূল্যবান","যে বেশি দুরুদ পড়ে, কিয়ামতের দিন সে নবীজী ﷺ-এর সবচেয়ে কাছে থাকবে।"]],
+    late:[["📿","আর মাত্র {r} বার!","তারপরই আজকের {d} পূর্ণ। আপনার প্রতিটা দুরুদ প্রিয় নবীজী ﷺ-এর কাছে পৌঁছে যায়।"],
+          ["📿","প্রায় পৌঁছে গেছেন!","আজকের লক্ষ্যের {p}% হয়ে গেছে, আর {r} বার।"],
+          ["📿","শেষ পথটুকু বাকি","আর {r} বার, তারপর আজকের সফর পূর্ণ, ইন শা আল্লহ।"]],
+    medal:[["🏆","আর {m} বার পড়লেই {a}-এর Achievement!","আজকের লক্ষ্য পূর্ণ করলেই নতুন Achievement পেয়ে যাবেন।"]],
+    done:[["🌿","মা শা আল্লহ! আজকের লক্ষ্য পূর্ণ","আল্লহ কবুল করুন। চাইলে আরো পড়ে যেতে পারেন।"],
+          ["🌿","না'আম না'আম ইয়া আল্লহ!","আমরা ওই জান্নাতের জন্যেই কোমর বাঁধলাম!"],
+          ["🌿","আলহামদুলিল্লাহ, আজকের {d} পূর্ণ","আজ মোট {t} বার। সল্লাল্লহু আলাইহি ওয়া সাল্লাম।"]],
+    streak:[["🔥","টানা {s} দিন!","এই ধারা ধরে রাখুন। আল্লহ নিয়মিত আমল ভালোবাসেন।"],
+            ["🔥","টানা {s} দিন পূর্ণ, মা শা আল্লহ","আগামীকালও এভাবেই, ইন শা আল্লহ।"]]
+  };
+  const picks={useStreak:Math.random()<.5};
+  const pick=cat=>{const a=MOT[cat];if(!(cat in picks))picks[cat]=Math.floor(Math.random()*a.length);return a[picks[cat]%a.length]};
+  function motivation(){
+    const td=todayStr(),t=dayTotal(td),d=state.daily,r=Math.max(0,d-t),s=streak(),nm=nextMedal();
+    let cat;
+    if(t>=d) cat=(s>=2&&picks.useStreak)?"streak":"done";
+    else if(t===0){ const y=addDays(td,-1); cat=(diff(state.start,y)>=0&&dayTotal(y)<d)?"missed":"start"; }
+    else if(nm&&nm.left>0&&nm.left<=r) cat="medal";
+    else cat=t>=d/2?"late":"early";
+    const m2=nm||{left:0,amt:0};
+    const fill=x=>x.replace("{t}",fmt(t)).replace("{d}",fmt(d)).replace("{r}",fmt(r)).replace("{p}",bn(Math.floor(t/d*100))).replace("{s}",bn(s)).replace("{m}",fmt(m2.left)).replace("{a}",fmt(m2.amt));
+    const m=pick(cat); $("mIcon").textContent=m[0]; $("mTitle").textContent=fill(m[1]); $("mBody").textContent=fill(m[2]);
+  }
+
+  /* ---------- fazilat: a different one each time the app opens ---------- */
+  const FAZ=[
+    ["নিশ্চয়ই আল্লহ ও তাঁর ফেরেশতাগণ নবীর উপর দুরুদ পাঠান। হে মুমিনগণ! তোমরাও তাঁর উপর দুরুদ পাঠ করো এবং যথাযথভাবে সালাম পেশ করো।","সূরা আল-আহযাব, ৩৩:৫৬"],
+    ["যে ব্যক্তি আমার উপর একবার দুরুদ পাঠ করে, আল্লহ তার উপর দশটি রহমত নাযিল করেন।","সহীহ মুসলিম, ৪০৮"],
+    ["যে আমার উপর একবার দুরুদ পাঠ করে, আল্লহ তার উপর দশটি রহমত নাযিল করেন, তার দশটি গুনাহ মাফ করেন এবং তার দশটি মর্যাদা বাড়িয়ে দেন।","সুনান আন-নাসাঈ, ১২৯৭"],
+    ["কিয়ামতের দিন মানুষের মধ্যে আমার সবচেয়ে নিকটবর্তী হবে সে, যে আমার উপর সবচেয়ে বেশি দুরুদ পাঠ করে।","জামে আত-তিরমিযি, ৪৮৪"],
+    ["উবাই ইবনে কা'ব (রা.) বললেন, আমি আমার দু'আর পুরো সময়টাই আপনার উপর দুরুদের জন্য রাখব। রসূলুল্লহ ﷺ বললেন: তাহলে তা তোমার সব দুশ্চিন্তার জন্য যথেষ্ট হবে এবং তোমার গুনাহ মাফ করে দেওয়া হবে।","জামে আত-তিরমিযি, ২৪৫৭"],
+    ["তোমরা জুমু'আর দিন আমার উপর বেশি বেশি দুরুদ পাঠ করো, কেননা তোমাদের দুরুদ আমার কাছে পেশ করা হয়।","সুনান আবু দাউদ, ১০৪৭"],
+    ["পৃথিবীতে আল্লহর কিছু ভ্রাম্যমাণ ফেরেশতা আছেন, যারা আমার উম্মতের সালাম আমার কাছে পৌঁছে দেন।","সুনান আন-নাসাঈ, ১২৮২"],
+    ["তোমরা যেখানেই থাকো, আমার উপর দুরুদ পাঠ করো; কেননা তোমাদের দুরুদ আমার কাছে পৌঁছে যায়।","সুনান আবু দাউদ, ২০৪২"],
+    ["যে কেউ আমাকে সালাম দেয়, আল্লহ আমার রূহ ফিরিয়ে দেন, যাতে আমি তার সালামের জবাব দিতে পারি।","সুনান আবু দাউদ, ২০৪১"],
+    ["প্রকৃত কৃপণ সেই ব্যক্তি, যার সামনে আমার নাম উচ্চারিত হলো, অথচ সে আমার উপর দুরুদ পাঠ করলো না।","জামে আত-তিরমিযি, ৩৫৪৬"],
+    ["উমর (রা.) বলেন: দু'আ আসমান ও জমিনের মাঝে ঝুলন্ত থাকে, তার কিছুই উপরে ওঠে না, যতক্ষণ না তুমি তোমার নবী ﷺ-এর উপর দুরুদ পাঠ করো।","জামে আত-তিরমিযি, ৪৮৬"],
+    ["তোমাদের কেউ যখন দু'আ করে, সে যেন প্রথমে আল্লহর প্রশংসা করে, তারপর নবী ﷺ-এর উপর দুরুদ পাঠ করে, তারপর যা ইচ্ছা দু'আ করে।","জামে আত-তিরমিযি, ৩৪৭৭"]
+  ];
+  let fz=Math.floor(Math.random()*FAZ.length);
+  {const last=parseInt(ls.get("durud-faz"),10);if(!isNaN(last)&&fz===last)fz=(fz+1+Math.floor(Math.random()*(FAZ.length-1)))%FAZ.length;ls.set("durud-faz",String(fz))}
+  function showFaz(){$("fazText").textContent="“"+FAZ[fz][0]+"”";$("fazRef").textContent="— "+FAZ[fz][1]}
+  $("fazPrev").onclick=()=>{fz=(fz-1+FAZ.length)%FAZ.length;showFaz()};
+  $("fazNext").onclick=()=>{fz=(fz+1)%FAZ.length;showFaz()};
+
+  /* ---------- Jumu'ah (Thursday maghrib → Friday maghrib) ---------- */
+  const JFAZ=[
+    ["তোমাদের দিনগুলোর মধ্যে জুমু'আর দিন সর্বোত্তম। সুতরাং এ দিন তোমরা আমার উপর বেশি বেশি দুরুদ পাঠ করো, কেননা তোমাদের দুরুদ আমার কাছে পেশ করা হয়।","সুনান আবু দাউদ, ১০৪৭; সুনান আন-নাসাঈ, ১৩৭৪"],
+    ["জুমু'আর দিন ও জুমু'আর রাতে তোমরা আমার উপর বেশি বেশি দুরুদ পাঠ করো। যে আমার উপর একবার দুরুদ পাঠ করে, আল্লহ তার উপর দশবার রহমত নাযিল করেন।","বায়হাকি, আস-সুনানুল কুবরা; সহীহুল জামে', ১২০৯"],
+    ["কিয়ামতের দিন মানুষের মধ্যে আমার সবচেয়ে নিকটবর্তী হবে সে, যে আমার উপর সবচেয়ে বেশি দুরুদ পাঠ করে।","জামে আত-তিরমিযি, ৪৮৪"],
+    ["যে আমার উপর একবার দুরুদ পাঠ করে, আল্লহ তার উপর দশটি রহমত নাযিল করেন, তার দশটি গুনাহ মাফ করেন এবং তার দশটি মর্যাদা বাড়িয়ে দেন।","সুনান আন-নাসাঈ, ১২৯৭"]
+  ];
+  let jz=Math.floor(Math.random()*JFAZ.length);
+  function showJ(){$("jText").textContent="“"+JFAZ[jz][0]+"”";$("jRef").textContent="— "+JFAZ[jz][1]}
+  $("jPrev").onclick=()=>{jz=(jz-1+JFAZ.length)%JFAZ.length;showJ()};
+  $("jNext").onclick=()=>{jz=(jz+1)%JFAZ.length;showJ()};
+  const clock=m=>{let h=Math.floor(m/60),mm=m%60;const ap=h<12?"সকাল":h<16?"দুপুর":h<18?"বিকাল":"সন্ধ্যা";h=h%12||12;return ap+" "+bn(h)+":"+bn(String(mm).padStart(2,"0"))};
+  function isJumuah(now){
+    now=now||new Date();const mins=now.getHours()*60+now.getMinutes(),mg=maghribMins(now),wd=now.getDay();
+    return (wd===4&&mins>=mg)||(wd===5&&mins<mg);
+  }
+  function renderMaghrib(){
+    const m=maghribMins(new Date());$("mgNow").textContent="আজ মাগরিব: "+clock(m);
+    $("mgMode").textContent=loc?"আপনার এলাকা অনুযায়ী, প্রতিদিন নিজে থেকে বদলাবে":"নিজের লেখা সময়";
+    $("locOff").hidden=!loc;$("mgManual").hidden=!!loc;$("locBtn").textContent=loc?"📍 এলাকা আবার নিন":"📍 আমার এলাকা থেকে বের করুন";
+  }
+  function getLocation(){
+    const msg=$("locMsg");
+    if(!navigator.geolocation){msg.textContent="এই ফোনে লোকেশন পাওয়া যাচ্ছে না। নিচে নিজে সময় লিখুন।";return}
+    msg.textContent="লোকেশন খোঁজা হচ্ছে…";
+    navigator.geolocation.getCurrentPosition(pos=>{
+      loc={lat:Math.round(pos.coords.latitude*100)/100,lng:Math.round(pos.coords.longitude*100)/100};
+      ls.set("durud-loc",JSON.stringify(loc));msg.textContent="✓ এলাকা পাওয়া গেছে। লোকেশন শুধু এই ফোনেই থাকে।";jOn=null;applyJumuah();renderMaghrib();
+    },err=>{
+      msg.textContent=err&&err.code===1?"লোকেশনের অনুমতি দেওয়া হয়নি। ফোনের সেটিংস থেকে অনুমতি দিন, অথবা নিচে নিজে সময় লিখুন।":"লোকেশন পাওয়া যায়নি। একটু পরে আবার চেষ্টা করুন, অথবা নিচে নিজে সময় লিখুন।";
+    },{enableHighAccuracy:false,timeout:15000,maximumAge:864e5});
+  }
+  let jOn=null;
+  function applyJumuah(){
+    const on=isJumuah(); if(on===jOn)return; jOn=on;
+    document.body.classList.toggle("jumuah",on);
+    $("jBadge").hidden=!on;$("jCard").hidden=!on;$("jTag").hidden=!on;$("jList").hidden=!on;if(on)renderJList();
+  }
+
+  /* ---------- pronunciation audio: files in audio/<id>.mp3; buttons stay hidden until a file exists ---------- */
+  const audioOk={}; let player=null, playingId=null;
+  DURUD.forEach(x=>{
+    const a=new Audio(); a.preload="metadata";
+    a.addEventListener("loadedmetadata",()=>{audioOk[x.id]=true;paintPlay()},{once:true});
+    a.addEventListener("error",()=>{},{once:true});
+    a.src="audio/"+x.id+".mp3";
+  });
+  function stopAudio(){if(player){player.pause();player=null}playingId=null;paintPlay()}
+  function playAudio(id){
+    if(playingId===id){stopAudio();return}
+    stopAudio(); player=new Audio("audio/"+id+".mp3"); playingId=id;
+    player.addEventListener("ended",stopAudio); player.play().catch(stopAudio); paintPlay();
+  }
+  function paintPlay(){
+    document.querySelectorAll("[data-play]").forEach(b=>{const id=b.dataset.play;b.hidden=!audioOk[id];const on=playingId===id;
+      b.querySelector("use").setAttribute("href",on?"#i-pause":"#i-play");b.querySelector("span").textContent=on?"থামান":"উচ্চারণ শুনুন"});
+    const tp=$("tPlay"),id=state.cur;tp.hidden=!audioOk[id];tp.querySelector("use").setAttribute("href",playingId===id?"#i-pause":"#i-play");
+    tp.setAttribute("aria-label",playingId===id?"থামান":"উচ্চারণ শুনুন");
+  }
+  document.addEventListener("click",e=>{const b=e.target.closest("[data-play]");if(b)playAudio(b.dataset.play)});
+  $("tPlay").onclick=()=>playAudio(state.cur);
+
+  /* ---------- টুকরো টুকরো নবী প্রেম ---------- */
+  const STORIES=[
+    {t:"তুমি যাকে ভালোবাসো, তার সাথেই থাকবে",
+     b:"আনাস (রাঃ) থেকে বর্ণিত: এক ব্যক্তি নবী (ﷺ)-কে জিজ্ঞেস করল, কেয়ামত কখন হবে? তিনি বললেন, তুমি কেয়ামতের জন্য কী জোগাড় করেছ? সে বলল, কোনো কিছু জোগাড় করতে পারিনি, তবে আমি আল্লাহ ও তাঁর রাসূলকে ভালোবাসি। তখন তিনি বললেন, তুমি তাঁদের সঙ্গেই থাকবে যাঁদেরকে তুমি ভালোবাস।\n\nআনাস (রাঃ) বলেন, নবী (ﷺ)-এর কথা দ্বারা আমরা এত আনন্দিত হয়েছি যে অন্য কোনো কথায় এত আনন্দিত হইনি। আনাস (রাঃ) বলেন, আমি নবী (ﷺ)-কে ভালোবাসি এবং আবু বকর ও উমর (রাঃ)-কেও। আশা করি তাঁদেরকে আমার ভালোবাসার কারণে তাঁদের সঙ্গে জান্নাতে বসবাস করতে পারব; যদিও তাঁদের আমলের মত আমল আমি করতে পারিনি।",
+     l:"আমলের পাশাপাশি নবীজী ﷺ-এর প্রতি সত্যিকারের ভালোবাসাই আখিরাতে তাঁর সঙ্গ পাওয়ার পথ। প্রতিটা দুরুদ সেই ভালোবাসারই প্রকাশ।",
+     r:"সহিহ বুখারি: ৩৬৮৮; সহিহ মুসলিম: ২৬৩৯"},
+    {t:"উমর (রা.)-এর ভালোবাসা",
+     b:"আবদুল্লাহ ইব্নু হিশাম (রাঃ) থেকে বর্ণিত: আমরা একবার নবী (ﷺ)-এর সঙ্গে ছিলাম। তিনি তখন উমর ইবন খাত্তাব (রাঃ)-এর হাত ধরেছিলেন। উমর (রাঃ) তাঁকে বললেন, হে আল্লাহর রাসূল! আমার জান ছাড়া আপনি আমার কাছে সব কিছু চেয়ে অধিক প্রিয়।\n\nতখন নবী (ﷺ) বললেনঃ না, যাঁর হাতে আমার প্রাণ ঐ সত্তার কসম! তোমার কাছে আমি যেন তোমার প্রাণের চেয়েও প্রিয় হই।\n\nতখন উমর (রাঃ) তাঁকে বললেন, আল্লাহর কসম! এখন আপনি আমার কাছে আমার প্রাণের চেয়েও বেশি প্রিয়। নবী (ﷺ) বললেনঃ হে উমর! এখন (তুমি সত্যিকার ইমানদার হলে)।",
+     l:"নবীজী ﷺ-এর ভালোবাসা নিজের প্রাণের চেয়েও বেশি হওয়াই ঈমানের পূর্ণতা।",
+     r:"সহিহ বুখারি: ৬৬৩২ (আধুনিক প্রকাশনী: ৬১৭০)"},
+    {t:"খেজুর গাছের কান্না",
+     b:"জাবির ইব্ন 'আবদুল্লাহ (রাঃ) থেকে বর্ণিত: নবী (ﷺ) একটি গাছের উপর কিংবা একটি খেজুর গাছের কাণ্ডের উপর শুক্রবারে খুতবা দেওয়ার জন্য দাঁড়াতেন। এমতাবস্থায় একজন আনসারী মহিলা অথবা পুরুষ বলল, হে আল্লাহর রাসূল! আপনার জন্য একটি মিম্বার বানিয়ে দিব? নবী (ﷺ) বললেন, তোমরা চাইলে দিতে পার। এরপর তারা একটি কাঠের মিম্বার বানিয়ে দিল। যখন শুক্রবার এল, নবী (ﷺ) মিম্বারে উঠলেন, তখন কাণ্ডটি শিশুর মতো চিৎকার করে কাঁদতে লাগল। নবী (ﷺ) মিম্বার হতে নেমে এসে ওটাকে জড়িয়ে ধরলেন। কিন্তু কাণ্ডটি শিশুর মত আরও ফুঁপিয়ে ফুঁপিয়ে কাঁদতে লাগল। বর্ণনাকারী বলেন, কাণ্ডটি এজন্য কাঁদছিল যেহেতু সে খুতবার সময় যিকর শুনতে পেত।",
+     l:"একটা গাছের গুঁড়ি যদি তাঁর বিরহে কাঁদতে পারে, তাহলে তাঁর উম্মত হিসেবে আমাদের অন্তরে তাঁর প্রতি টান কতটা হওয়া উচিত!",
+     r:"সহিহ বুখারি: ৩৫৮৪"},
+    {t:"আমার ভাইদের দেখতে ইচ্ছে করে",
+     b:"একদিন নবীজী ﷺ বললেন, আমার খুব ইচ্ছে হয়, যদি আমাদের ভাইদের দেখতে পেতাম! সাহাবিরা বললেন, আমরা কি আপনার ভাই নই? তিনি বললেন, তোমরা আমার সাথী। আমার ভাই তারা, যারা এখনো আসেনি, যারা আমাকে না দেখেই আমার উপর ঈমান আনবে।",
+     l:"নবীজী ﷺ আমাদের না দেখেই ভালোবেসেছেন, আমাদের দেখতে চেয়েছেন। আমাদের দুরুদ সেই ভালোবাসার জবাব।",
+     r:"সহিহ মুসলিম: ২৪৯"},
+    {t:"উম্মাতি, উম্মাতি",
+     b:"নবীজী ﷺ একবার ইব্রাহিম (আ.) ও ঈসা (আ.)-এর দু'আ সংক্রান্ত আয়াত তিলাওয়াত করলেন, তারপর দুই হাত তুলে বললেন, হে আল্লহ! আমার উম্মত, আমার উম্মত! এবং কাঁদতে লাগলেন। আল্লহ জিবরীল (আ.)-কে পাঠালেন এবং বললেন, মুহাম্মাদকে বলো, তোমার উম্মতের ব্যাপারে আমি তোমাকে সন্তুষ্ট করব, তোমাকে কষ্ট দেব না।",
+     l:"যিনি আমাদের জন্য কেঁদেছেন, তাঁর জন্য প্রতিদিন কিছু দুরুদ পাঠানো আমাদের সামান্য কৃতজ্ঞতা।",
+     r:"সহিহ মুসলিম: ২০২"},
+    {t:"উবাই ইবনে কা'ব (রা.)-এর দু'আর সময়",
+     b:"উবাই ইবনে কা'ব (রা.) জিজ্ঞেস করলেন, হে আল্লহর রসূল! আমি আপনার উপর অনেক দুরুদ পড়ি, আমার দু'আর কতটুকু সময় আপনার জন্য রাখব? নবীজী ﷺ বললেন, যতটুকু ইচ্ছা। তিনি বললেন, এক-চতুর্থাংশ? অর্ধেক? দুই-তৃতীয়াংশ? প্রতিবারই নবীজী ﷺ বললেন, যতটুকু ইচ্ছা, তবে বাড়ালে তোমার জন্যই ভালো। শেষে উবাই (রা.) বললেন, তাহলে পুরো সময়টাই আপনার জন্য দুরুদে রাখব। নবীজী ﷺ বললেন, তাহলে তা তোমার সব দুশ্চিন্তার জন্য যথেষ্ট হবে এবং তোমার গুনাহ মাফ করে দেওয়া হবে।",
+     l:"দুরুদ শুধু সওয়াব না, দুশ্চিন্তা দূর করার উপায়ও।",
+     r:"জামে আত-তিরমিযি: ২৪৫৭"},
+    {t:"যে দু'আয় তাড়াহুড়া করল",
+     b:"নবীজী ﷺ শুনলেন, এক ব্যক্তি নামাজে দু'আ করছে, কিন্তু আল্লহর প্রশংসা করেনি, নবীজী ﷺ-এর উপর দুরুদও পড়েনি। নবীজী ﷺ বললেন, সে তাড়াহুড়া করেছে। তারপর শিখিয়ে দিলেন, তোমাদের কেউ দু'আ করলে প্রথমে আল্লহর প্রশংসা করবে, তারপর নবীর উপর দুরুদ পড়বে, তারপর যা ইচ্ছা চাইবে।",
+     l:"দু'আর আগে দুরুদ পড়লে সেই দু'আ আরো কবুলযোগ্য হয়।",
+     r:"জামে আত-তিরমিযি: ৩৪৭৭; সুনান আবু দাউদ: ১৪৮১"},
+    {t:"উহুদের সেই আনসারি নারী",
+     b:"উহুদ যুদ্ধের পর এক আনসারি নারীকে জানানো হলো, তাঁর বাবা, ভাই ও স্বামী শহীদ হয়েছেন। তিনি বারবার জিজ্ঞেস করছিলেন, আল্লহর রসূল ﷺ কেমন আছেন? লোকেরা বলল, আলহামদুলিল্লাহ, তিনি ভালো আছেন। তিনি বললেন, আমাকে দেখাও, আমি নিজে দেখব। নবীজী ﷺ-কে দেখে তিনি বললেন, আপনি নিরাপদ থাকলে বাকি সব বিপদ তুচ্ছ।",
+     l:"সাহাবিয়াদের কাছে নবীজী ﷺ ছিলেন নিজের পরিবারের চেয়েও প্রিয়।",
+     r:"সীরাতে ইবনে হিশাম (ইবনে ইসহাক থেকে বর্ণিত)"}
+  ];
+  const doy=Math.floor((new Date()-new Date(new Date().getFullYear(),0,0))/864e5);
+  const todayStory=doy%STORIES.length;
+  function buildStories(){
+    const box=$("storyList");
+    STORIES.forEach((x,i)=>{const a=document.createElement("article");a.className="card story";a.id="story-"+i;
+      a.innerHTML='<h3></h3><p class="body"></p><div class="lesson"><b>শিক্ষা:</b> <span></span></div><p class="ref"></p>';
+      a.querySelector("h3").textContent=bn(i+1)+". "+x.t;a.querySelector(".body").textContent=x.b;a.querySelector(".lesson span").textContent=x.l;a.querySelector(".ref").textContent="["+x.r+"]";
+      box.appendChild(a)});
+    const st=STORIES[todayStory];$("sTitle").textContent=st.t;$("sPrev").textContent=st.b;$("sNo").textContent="আজকের গল্প";
+  }
+  let dSeg="list";
+  function setSeg(v){dSeg=v;$("durudList").hidden=v!=="list";$("storyList").hidden=v!=="story";
+    document.querySelectorAll("#dSeg button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.s===v)))}
+  document.querySelectorAll("#dSeg button").forEach(b=>b.onclick=()=>setSeg(b.dataset.s));
+  $("sOpen").onclick=()=>{go("durud");setSeg("story");const el=$("story-"+todayStory);
+    requestAnimationFrame(()=>{el.scrollIntoView({block:"start"});window.scrollBy(0,-12);el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash")})};
+
+  /* ---------- Jumu'ah checklist (saved per Jumu'ah) ---------- */
+  const JLIST=[
+    ["গোসল করা",""],
+    ["আতর / উত্তম সুগন্ধি ব্যবহার",""],
+    ["মিসওয়াক করা",""],
+    ["পরিষ্কার, সুন্দর পোশাক",""],
+    ["সূরা কাহফ তিলাওয়াত","শুক্রবার"],
+    ["বেশি বেশি দুরুদ",""],
+    ["আসর থেকে মাগরিব বেশি বেশি দু'আ","দু'আ কবুলের মুহূর্ত"]
+  ];
+  function jKey(){const n=new Date();const td=iso(n);return "durud-jumuah-"+(n.getDay()===4?addDays(td,1):td)}
+  function jDone(){try{const a=JSON.parse(ls.get(jKey())||"[]");return a.filter(v=>typeof v==="string")}catch(e){return[]}}
+  function renderJList(){
+    const box=$("jItems"),done=jDone();box.innerHTML="";
+    JLIST.forEach((x,i)=>{const b=document.createElement("button");b.type="button";b.className="jitem";const key=x[0],on=done.includes(key);b.setAttribute("aria-pressed",String(on));
+      b.innerHTML='<span class="bx">'+(on?"✓":"")+'</span><span class="tx"></span>';
+      const tx=b.querySelector(".tx");tx.textContent=x[0];if(x[1]){const sm=document.createElement("small");sm.textContent=x[1];tx.appendChild(sm)}
+      b.onclick=()=>{let d=jDone();d=d.includes(key)?d.filter(v=>v!==key):d.concat(key);ls.set(jKey(),JSON.stringify(d));renderJList();
+        if(JLIST.every(x=>d.includes(x[0])))toast("মা শা আল্লহ! জুমু'আর সব আমল পূর্ণ 🌿")};
+      box.appendChild(b)});
+    const n=JLIST.filter(x=>done.includes(x[0])).length;$("jCount").textContent=bn(n)+"/"+bn(JLIST.length);$("jBar").style.width=(n/JLIST.length*100)+"%";
+  }
+
+
+  /* ---------- Sunnah revival ---------- */
+  const SMAIN=[
+    {id:"salam",t:"আগে সালাম দেওয়া, সালামের প্রসার",q:"“তোমরা পরস্পরে সালামের প্রসার ঘটাও।” · মুসলিম ৫৪"},
+    {id:"miswak",t:"মিসওয়াক করা",q:"“উম্মতের কষ্ট না হলে প্রতি নামাজে মিসওয়াকের আদেশ দিতাম।” · বুখারি ৮৮৭"},
+    {id:"azan",t:"আজানের জবাব দেওয়া",q:"মুয়াজ্জিন যা বলে, তা-ই বলা · মুসলিম ৩৮৩"},
+    {id:"masnun",t:"মাসনুন আমল",q:"সারাদিনের মাসনুন দু'আ ও যিকির",subs:[["sokal","সকাল"],["sondha","সন্ধ্যা"],["ghum","ঘুমের আগে"]]},
+    {id:"sadaqah",t:"অল্প হলেও সাদাকাহ",q:"“আধা খেজুর দিয়ে হলেও জাহান্নাম থেকে বাঁচো।” · বুখারি ১৪১৭"}
+  ];
+  const SMORE=[
+    ["দৈনন্দিন",[["d1","আজানের পর দু'আ পড়া","বুখারি ৬১৪"],["d2","ওযুর পর কালিমায়ে শাহাদাত","মুসলিম ২৩৪"],["d3","সব কাজ ডান দিক থেকে শুরু","বুখারি ১৬৮"],["d4","ঘরে ঢোকার সময় আল্লহর নাম নেওয়া","মুসলিম ২০১৮"],["d5","সাইয়্যিদুল ইস্তিগফার","বুখারি ৬৩০৬"],["d6","ফজরের আগে দুই রাকাত সুন্নাত","মুসলিম ৭২৫"],["d7","দুহা / ইশরাকের নামাজ","মুসলিম ৭২০"]]],
+    ["খাওয়া",[["k1","বিসমিল্লাহ বলে ডান হাতে, নিজের সামনে থেকে খাওয়া","বুখারি ৫৩৭৬"],["k2","খাওয়ার পর আঙুল চেটে খাওয়া","মুসলিম ২০৩৩"],["k3","বসে পানি পান করা","মুসলিম ২০২৪"],["k4","তিন নিঃশ্বাসে পান করা","মুসলিম ২০২৮"],["k5","খাবারের দোষ না ধরা","বুখারি ৫৪০৯"],["k6","খাওয়ার পর আলহামদুলিল্লাহ","মুসলিম ২৭৩৪"]]],
+    ["ঘুম",[["g1","ওযু করে ডান কাতে শোয়া, শোয়ার দু'আ","বুখারি ২৪৭"],["g2","ঘুমের আগে আয়াতুল কুরসি","বুখারি ২৩১১"],["g3","তিন কুল পড়ে শরীরে ফুঁ দেওয়া","বুখারি ৫০১৭"],["g4","তাসবিহে ফাতিমি (৩৩-৩৩-৩৪)","বুখারি ৩৭০৫"],["g5","বিছানা ঝেড়ে শোয়া","বুখারি ৬৩২০"],["g6","রাতে সূরা মুলক","তিরমিযি ২৮৯১"]]],
+    ["মানুষের সাথে",[["m1","হাসিমুখে সাক্ষাৎ","মুসলিম ২৬২৬"],["m2","হাঁচির জবাব দেওয়া","বুখারি ৬২২৪"],["m3","অসুস্থের খোঁজ নেওয়া","মুসলিম ২৫৬৮"],["m4","হাদিয়া দেওয়া","আল-আদাবুল মুফরাদ ৫৯৪"],["m5","আত্মীয়ের খোঁজ নেওয়া","বুখারি ৫৯৮৬"],["m6","রাগ হলে চুপ থাকা বা বসে পড়া","আবু দাউদ ৪৭৮২"]]],
+    ["ঘর ও অন্যান্য",[["h1","ঘরের কাজে সাহায্য করা","বুখারি ৬৭৬"],["h2","সোমবার ও বৃহস্পতিবারের রোজা","তিরমিযি ৭৪৭"]]]
+  ];
+  const SKEY="durud-sunnah-v1";
+  let sun={}; try{sun=JSON.parse(ls.get(SKEY)||"{}")||{}}catch(e){sun={}}
+  const sday=ds=>{const o=sun[ds]||{};return{m:o.m||[],s:o.s||[],x:o.x||[]}};
+  function sSave(ds,o){if(!o.m.length&&!o.s.length&&!o.x.length)delete sun[ds];else sun[ds]=o;ls.set(SKEY,JSON.stringify(sun))}
+  const mainDone=(o,id)=>id==="masnun"?o.s.length>0:o.m.includes(id);
+  const doneCount=ds=>{const o=sday(ds);return SMAIN.filter(x=>mainDone(o,x.id)).length};
+  let suCat=0;
+  function renderSunnah(){
+    const td=todayStr(),o=sday(td),n=doneCount(td);
+    $("suDone").textContent=bn(n)+"/"+bn(SMAIN.length);$("suArc").setAttribute("stroke-dashoffset",(201*(1-n/SMAIN.length)).toFixed(1));
+    let st=0,cur=n===SMAIN.length?td:addDays(td,-1);while(doneCount(cur)===SMAIN.length&&st<999){st++;cur=addDays(cur,-1)}
+    const mon=td.slice(0,7);let tot=0;for(const k in sun){if(k.slice(0,7)===mon){const v=sday(k);tot+=SMAIN.filter(x=>mainDone(v,x.id)).length+v.x.length}}
+    $("suSub").textContent=(st>=1?"টানা "+bn(st)+" দিন সব পূর্ণ · ":"")+"এই মাসে "+bn(tot)+" বার সুন্নাহ জীবিত করেছেন";
+    const dow=(parse(td).getDay()+1)%7,sat=addDays(td,-dow);
+    const box=$("suMain");box.innerHTML="";
+    SMAIN.forEach(x=>{
+      const on=mainDone(o,x.id),row=document.createElement("div");row.className="sit";
+      const tk=document.createElement("button");tk.type="button";tk.className="tick";tk.setAttribute("aria-pressed",String(on));tk.textContent=on?"✓":"";tk.setAttribute("aria-label",x.t);
+      const t=document.createElement("div");t.className="t";const b=document.createElement("b");b.textContent=x.t;const pq=document.createElement("p");pq.textContent=x.q;t.append(b,pq);
+      if(x.subs){
+        tk.onclick=()=>{const v=sday(td);v.s=v.s.length?[]:x.subs.map(z=>z[0]);sSave(td,v);renderSunnah()};
+        const ss=document.createElement("div");ss.className="subs";
+        x.subs.forEach(([sid,lab])=>{const sb=document.createElement("button");sb.type="button";sb.className="sub";const son=o.s.includes(sid);sb.setAttribute("aria-pressed",String(son));sb.textContent=(son?"✓ ":"")+lab;
+          sb.onclick=()=>{const v=sday(td);v.s=v.s.includes(sid)?v.s.filter(z=>z!==sid):v.s.concat(sid);sSave(td,v);renderSunnah()};ss.appendChild(sb)});
+        t.appendChild(ss);
+      }else tk.onclick=()=>{const v=sday(td);v.m=v.m.includes(x.id)?v.m.filter(z=>z!==x.id):v.m.concat(x.id);sSave(td,v);renderSunnah();if(doneCount(td)===SMAIN.length)toast("মা শা আল্লহ! আজকের নিত্যদিনের সুন্নাহ পূর্ণ 🌿")};
+      const wk=document.createElement("div");wk.className="wk";
+      for(let i=0;i<7;i++){const ds=addDays(sat,i),dot=document.createElement("i");if(mainDone(sday(ds),x.id))dot.className="on";if(ds===td)dot.classList.add("tdy");wk.appendChild(dot)}
+      t.appendChild(wk);row.append(tk,t);box.appendChild(row);
+    });
+    const cats=$("suCats");if(!cats.childElementCount)SMORE.forEach(([name],i)=>{const c=document.createElement("button");c.type="button";c.className="chip";c.textContent=name;c.onclick=()=>{suCat=i;renderSunnah()};cats.appendChild(c)});
+    [...cats.children].forEach((c,i)=>c.setAttribute("aria-pressed",String(i===suCat)));
+    const more=$("suMore");more.innerHTML="";
+    SMORE[suCat][1].forEach(([id,t,r])=>{const on=o.x.includes(id),b=document.createElement("button");b.type="button";b.className="srow";b.setAttribute("aria-pressed",String(on));
+      b.innerHTML='<span class="tick" aria-pressed="'+on+'">'+(on?"✓":"")+'</span><span></span><small></small>';b.children[1].textContent=t;b.children[2].textContent=r;
+      b.onclick=()=>{const v=sday(td);v.x=v.x.includes(id)?v.x.filter(z=>z!==id):v.x.concat(id);sSave(td,v);renderSunnah()};more.appendChild(b)});
+  }
+
+  /* ---------- Ayyam al-Bid (13, 14, 15 of each Hijri month) ---------- */
+  /* fasting days of a Hijri month: 13–15; in Dhul Hijjah only 14–15 (13th is a day of Tashriq, fasting not allowed); none in Ramadan */
+  const bidDays=m=>m===9?[]:m===12?[14,15]:[13,14,15];
+  const isBid=h=>!!h&&bidDays(h.m).includes(h.d);
+  const bidPos=h=>{const a=bidDays(h.m);return bn(a.indexOf(h.d)+1)+"/"+bn(a.length)};
+  const bidEve=h=>{const a=bidDays(h.m);return !!h&&a.length>0&&h.d===a[0]-1};
+  function renderFast(){
+    const td=todayStr(),h=hijri(td),card=$("fastCard");
+    if(!h){card.hidden=true;return}
+    const night=afterMaghrib();let t="",p="",tick=false;
+    if(dayMode==="maghrib"){
+      if(isBid(h)&&night){t="আজ রাতে সাহরি, ইন শা আল্লহ";p="কাল আইয়ামে বীজের রোজা, দিন "+bidPos(h)+" ("+h.txt+")।"}
+      else if(isBid(h)){t="আজ আইয়ামে বীজের রোজা · দিন "+bidPos(h);p=h.txt+"। আল্লহ কবুল করুন।";tick=true}
+      else if(bidEve(h)){t="🌙 আজ মাগরিব থেকে আইয়ামে বীজ শুরু";p=(h.m===12?"১৪ ও ১৫ তারিখের রোজা (১৩ তারিখ আইয়ামে তাশরীক)।":"১৩, ১৪, ১৫ তারিখের রোজা।")+" আজ রাতে সাহরির নিয়ত রাখুন।"}
+    }else{
+      const nx=hijri(addDays(td,1));
+      if(isBid(h)){t="আজ আইয়ামে বীজের রোজা · দিন "+bidPos(h);p=h.txt+"। আল্লহ কবুল করুন।";tick=true}
+      else if(isBid(nx)&&night){t="আজ রাতে সাহরি, ইন শা আল্লহ";p="কাল আইয়ামে বীজের রোজা ("+nx.txt+")।"}
+      else if(nx&&bidEve(nx)){t="🌙 কাল থেকে আইয়ামে বীজের রোজা";p=(nx.m===12?"১৪ ও ১৫ তারিখ।":"১৩, ১৪, ১৫ তারিখ।")+" আজ রাতে সাহরির নিয়ত রাখুন।"}
+    }
+    card.hidden=!t;if(!t)return;$("fastT").textContent=t;$("fastP").textContent=p;
+    const fd=$("fastDone");fd.hidden=!tick;if(tick){const on=ls.get("durud-fast-"+td)==="1";fd.setAttribute("aria-pressed",String(on));fd.textContent=on?"✓ রোজা রেখেছি":"রোজা রেখেছি"}
+  }
+  $("fastDone").onclick=()=>{const k="durud-fast-"+todayStr(),on=ls.get(k)==="1";ls.set(k,on?"0":"1");renderFast();if(!on)toast("মা শা আল্লহ! আল্লহ কবুল করুন 🌙")};
+
+  /* ---------- medals ---------- */
+  const STEPS=[0.1,0.25,0.5,0.75,1];
+  const MEDAL_COL=[["#d9b48a","#9a6b3c"],["#e2e5e8","#8f979e"],["#f6e2a2","#b08a3a"],["#f3e7c4","#2f8a5b"],["#fff1bf","#c79a2e"]];
+  function medalSVG(i){const[a,b]=MEDAL_COL[i];
+    return '<svg viewBox="0 0 46 56" aria-hidden="true"><path d="M13 0h8l4 16h-8z" fill="#1f7a4c"/><path d="M33 0h-8l-4 16h8z" fill="#2c9a62"/><circle cx="23" cy="34" r="18" fill="'+b+'"/><circle cx="23" cy="34" r="15" fill="'+a+'"/><path d="M23 23l3.1 6.4 7 .9-5.1 4.9 1.3 7-6.3-3.4-6.3 3.4 1.3-7-5.1-4.9 7-.9z" fill="'+b+'"/></svg>'}
+  function checkMedals(){const t=total();let won=null;STEPS.forEach((f,i)=>{if(t>=state.goal*f&&!state.medals.includes(f)){state.medals.push(f);won=i}});return won}
+  function nextMedal(){const t=total();for(const f of STEPS){if(!state.medals.includes(f)){const amt=Math.round(state.goal*f);return{amt,left:Math.max(0,amt-t)}}}return null}
+  function celebrateMedal(i){const amt=Math.round(state.goal*STEPS[i]);
+    $("mdIcon").innerHTML=medalSVG(i);$("mdT").textContent=STEPS[i]===1?"আলহামদুলিল্লাহ! লক্ষ্য পূর্ণ":"মা শা আল্লহ! নতুন Achievement";
+    $("mdText").textContent=fmt(amt)+" বার দুরুদ পূর্ণ হয়েছে। আল্লহ কবুল করুন, আর প্রিয় নবীজী ﷺ-এর নৈকট্য দান করুন।";
+    $("medalModal").hidden=false;stars(4200)}
+
+  /* ---------- celebration stars & toast ---------- */
+  function stars(ms){
+    if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+    const cv=$("fx"),ctx=cv.getContext("2d"),dpr=Math.min(2,window.devicePixelRatio||1),W=innerWidth,H=innerHeight;
+    cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
+    const cols=["#f6e2a2","#d6b25e","#fff3cc","#b08a3a","#5aa77a"];
+    const P=Array.from({length:Math.min(140,Math.round(W/3.5))},()=>({x:Math.random()*W,y:-20-Math.random()*H*.6,r:4+Math.random()*7,vy:1.6+Math.random()*2.6,vx:-.6+Math.random()*1.2,a:Math.random()*6.28,va:-.08+Math.random()*.16,c:cols[Math.random()*5|0]}));
+    const t0=performance.now();
+    const star=(x,y,r,a)=>{ctx.save();ctx.translate(x,y);ctx.rotate(a);ctx.beginPath();for(let i=0;i<10;i++){const rr=i%2?r*.45:r,th=i*Math.PI/5;ctx.lineTo(Math.sin(th)*rr,-Math.cos(th)*rr)}ctx.closePath();ctx.fill();ctx.restore()};
+    (function frame(now){const el=now-t0;ctx.clearRect(0,0,W,H);const fade=el>ms-800?Math.max(0,(ms-el)/800):1;
+      P.forEach(p=>{p.y+=p.vy;p.x+=p.vx+Math.sin((p.y+p.r*20)/40)*.4;p.a+=p.va;ctx.globalAlpha=fade;ctx.fillStyle=p.c;star(p.x,p.y,p.r,p.a)});
+      if(el<ms)requestAnimationFrame(frame);else ctx.clearRect(0,0,W,H)})(t0);
+  }
+  let toastT;
+  function toast(msg){const t=$("toast");t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,2600)}
+
+  /* ---------- render: home ---------- */
+  function renderHome(){
+    const td=todayStr(),t=dayTotal(td),d=state.daily;
+    $("heroDay").textContent="দুরুদের সফর · দিন "+bn(Math.max(1,diff(state.start,td)+1));
+    {const h=hijri(td),night=dayMode==="maghrib"&&afterMaghrib();
+     $("hDate").innerHTML="";const a=document.createElement("b");a.textContent=h?h.txt:"";const b=document.createElement("span");
+     b.textContent=(h?" · ":"")+WDF[parse(td).getDay()]+(night?" রাত":"")+", "+pretty(td);$("hDate").append(a,b)}
+    $("hCount").textContent=fmt(t);$("hGoal").textContent="/ "+fmt(d)+" আজ";
+    $("hBar").style.width=Math.min(100,t/d*100)+"%";
+    motivation();renderFast();
+    const dow=(parse(td).getDay()+1)%7, sat=addDays(td,-dow), wk=$("week"); wk.innerHTML="";
+    for(let i=0;i<7;i++){
+      const ds=addDays(sat,i),v=dayTotal(ds),el=document.createElement("div");el.className="wd";
+      const fut=diff(td,ds)>0,before=diff(state.start,ds)<0;
+      if(v>=d)el.classList.add("ok");else if(v>0&&!fut)el.classList.add("part");
+      if(fut||before)el.classList.add("off");
+      if(ds===td)el.classList.add("today");
+      const p=Math.min(100,Math.round(v/d*100));
+      el.innerHTML='<i'+(v>0&&v<d?' style="background:conic-gradient(var(--g) '+p+'%,var(--gl) 0)"':'')+'>'+(v>=d?"✓":"")+'</i>'+WD[parse(ds).getDay()];
+      el.title=prettyW(ds)+" · "+fmt(v);
+      wk.appendChild(el);
+    }
+    const s=streak();$("streakLbl").textContent=s>=1?"টানা "+bn(s)+" দিন পূর্ণ 🔥":"আজকের লক্ষ্য "+fmt(d);
+    const cur=DBY[state.cur];$("cName").textContent=cur.name;$("cCount").textContent="আজ "+fmt(dayObj(td)[cur.id]||0)+" বার";
+    tickDay();
+    const rows=$("todayRows");rows.innerHTML="";
+    const shown=DURUD.filter(x=>(dayObj(td)[x.id]||0)>0||x.id===state.cur).sort((a,b)=>(dayObj(td)[b.id]||0)-(dayObj(td)[a.id]||0));
+    shown.forEach(x=>{const b=document.createElement("button");b.type="button";b.className="row";
+      b.innerHTML='<i style="background:var('+colOf(x.id)+')"></i><span></span><b class="num"></b><span class="go">›</span>';
+      b.children[1].textContent=x.name;b.children[2].textContent=fmt(dayObj(td)[x.id]||0);
+      b.setAttribute("aria-label",x.name+": আজ "+fmt(dayObj(td)[x.id]||0)+" — পড়া শুরু করুন");
+      b.onclick=()=>{state.cur=x.id;persist();go("tasbih")};rows.appendChild(b)});
+    const more=document.createElement("button");more.type="button";more.className="row";more.style.color="var(--g)";more.style.fontWeight="600";
+    more.textContent="সব দুরুদ দেখুন ›";more.onclick=()=>go("durud");rows.appendChild(more);
+  }
+
+  /* ---------- render: durud list (built once) ---------- */
+  function buildDurud(){
+    const box=$("durudList");
+    DURUD.forEach(x=>{
+      const a=document.createElement("article");a.className="card dcard";
+      a.innerHTML='<div class="top2"><h3></h3><span class="today num" data-today="'+x.id+'"></span></div><p class="arab ar"></p><p class="mean"><b>অর্থ:</b> <span></span></p><div class="fbox"></div><p class="ref"></p><div class="acts"><button class="play" type="button" data-play="'+x.id+'" hidden><svg><use href="#i-play"/></svg><span>উচ্চারণ শুনুন</span></button><button class="btn primary" type="button">এটা পড়ব →</button></div>';
+      a.querySelector("h3").textContent=x.title;a.querySelector(".arab").textContent=x.ar;a.querySelector(".mean span").textContent=x.mean;
+      a.querySelector(".fbox").textContent=x.faz;a.querySelector(".ref").textContent=x.ref;
+      a.querySelector(".btn.primary").onclick=()=>{state.cur=x.id;persist();go("tasbih")};
+      box.appendChild(a);
+    });
+  }
+  $("frToggle").onclick=()=>{const a=$("fazRead"),o=!a.classList.contains("open");a.classList.toggle("open",o);$("frToggle").setAttribute("aria-expanded",String(o));$("frToggle").textContent=o?"সংক্ষেপ করুন ‹":"পুরোটা পড়ুন ›"};
+  function renderDurud(){const td=todayStr();document.querySelectorAll("[data-today]").forEach(el=>el.textContent="আজ "+fmt(dayObj(td)[el.dataset.today]||0))}
+
+  /* ---------- render: tasbih ---------- */
+  function buildBeads(){let h="";for(let i=0;i<33;i++){const a=-Math.PI/2+2*Math.PI*i/33;h+='<circle cx="'+(125+108*Math.cos(a)).toFixed(1)+'" cy="'+(125+108*Math.sin(a)).toFixed(1)+'" r="6"/>'}$("beads").innerHTML=h;
+    const sel=$("tSel");DURUD.forEach(x=>{const o=document.createElement("option");o.value=x.id;o.textContent=x.name;sel.appendChild(o)})}
+  function renderTasbih(){
+    const td=todayStr(),cur=DBY[state.cur],c=dayObj(td)[cur.id]||0;
+    $("tSel").value=cur.id;$("tAr").textContent=cur.ar;$("tN").textContent=fmt(c);
+    const lit=c===0?0:(c%33||33);
+    $("tS").textContent=c===0?"ট্যাপ করে শুরু করুন":"দানা "+bn(lit)+"/৩৩ · চক্র "+bn(Math.floor((c-1)/33)+1);
+    [...$("beads").children].forEach((el,i)=>{const on=i<lit;el.setAttribute("r",on?"7.5":"6");el.setAttribute("fill",on?"#e8c873":"rgba(232,200,115,.22)")});
+    $("tTotal").textContent=fmt(dayTotal(td));$("tGoal").textContent=fmt(state.daily);
+    paintPlay();
+    const sb=$("tSound");sb.setAttribute("aria-pressed",String(prefs.sound));sb.querySelector("use").setAttribute("href",prefs.sound?"#i-sound":"#i-mute");
+  }
+
+  /* ---------- render: history ---------- */
+  let range="7";
+  function renderHistory(){
+    const td=todayStr(),d=state.daily;let days=[];
+    if(range==="all"){const n=Math.max(1,diff(state.start,td)+1);for(let i=0;i<n;i++)days.push(addDays(state.start,i))}
+    else{const n=+range;for(let i=n-1;i>=0;i--)days.push(addDays(td,-i))}
+    const valid=days.filter(ds=>diff(state.start,ds)>=0&&diff(ds,td)>=0);
+    const tot=valid.reduce((a,ds)=>a+dayTotal(ds),0),best=valid.reduce((a,ds)=>Math.max(a,dayTotal(ds)),0);
+    $("tTot").textContent=fmt(tot);$("tTotL").textContent=range==="all"?"সব মিলিয়ে":"এই "+bn(range)+" দিনে";
+    $("tAvg").textContent=fmt(valid.length?tot/valid.length:0);$("tBest").textContent=fmt(best);
+    let buckets,goalLine,weekly=false;
+    if(range==="all"&&days.length>31){weekly=true;buckets=[];for(let i=0;i<days.length;i+=7)buckets.push({lab:bn(buckets.length+1),days:days.slice(i,i+7)});goalLine=d*7}
+    else{buckets=days.map(ds=>({lab:range==="7"?WD[parse(ds).getDay()]:bn(parse(ds).getDate()),days:[ds],today:ds===td}));goalLine=d}
+    const top=topIds(),SER=top.map((id,i)=>({ids:[id],name:DBY[id].name,short:DBY[id].short,col:RANKCOL[i]}));
+    const rest=DURUD.map(x=>x.id).filter(id=>!top.includes(id));if(rest.length)SER.push({ids:rest,name:"অন্যান্য",short:"অন্যান্য",col:"--d5"});
+    buckets.forEach(b=>{b.parts=SER.map(se=>b.days.reduce((a,ds)=>a+se.ids.reduce((q,id)=>q+(dayObj(ds)[id]||0),0),0));b.sum=b.parts.reduce((a,c)=>a+c,0)});
+    $("chTitle").textContent=weekly?"প্রতি সপ্তাহে কত বার":"প্রতিদিন কত বার";
+    $("chGoal").textContent="- - লক্ষ্য "+fmt(goalLine);
+    const W=320,H=210,L=36,R=6,T=18,B=24,ph=H-T-B,n=buckets.length,slot=(W-L-R)/n,bw=Math.min(28,slot*.64);
+    const max=Math.max(goalLine*1.15,...buckets.map(b=>b.sum*1.12),10);
+    const Y=v=>T+ph-(v/max)*ph;
+    let s='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(0)+'" y2="'+Y(0)+'" style="stroke:var(--line)"/>';
+    [0,goalLine/2,goalLine].forEach(v=>{s+='<text x="'+(L-5)+'" y="'+(Y(v)+3.5)+'" font-size="9.5" text-anchor="end" style="fill:var(--muted)">'+fmt(v)+'</text>'});
+    s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(goalLine)+'" y2="'+Y(goalLine)+'" stroke-dasharray="4 4" style="stroke:var(--accent)"/>';
+    const every=n<=10?1:Math.ceil(n/7);
+    buckets.forEach((b,i)=>{
+      const x=L+i*slot+(slot-bw)/2;let y=Y(0);
+      b.parts.forEach((v,k)=>{if(!v)return;const h=Y(0)-Y(v);y-=h;s+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)+'" style="fill:var('+SER[k].col+')"><title>'+SER[k].name+': '+fmt(v)+'</title></rect>'});
+      if(n<=10&&b.sum)s+='<text x="'+(x+bw/2)+'" y="'+(y-4)+'" font-size="9.5" font-weight="700" text-anchor="middle" style="fill:var(--ink)">'+fmt(b.sum)+'</text>';
+      if(i%every===0||i===n-1)s+='<text x="'+(x+bw/2)+'" y="'+(H-8)+'" font-size="10" text-anchor="middle" font-weight="'+(b.today?700:400)+'" style="fill:'+(b.today?"var(--g)":"var(--muted)")+'">'+b.lab+'</text>';
+    });
+    $("chart").innerHTML=s;
+    $("legend").innerHTML=SER.map(x=>'<span><i style="background:var('+x.col+')"></i>'+x.short+'</span>').join("");
+    const list=$("dayList");list.innerHTML="";
+    valid.slice().reverse().slice(0,100).forEach(ds=>{const v=dayTotal(ds),b=document.createElement("button");b.type="button";b.className="li";
+      b.innerHTML='<span></span><b class="num"></b>';{const h=hijri(ds);b.children[0].textContent=prettyW(ds)+(ds===td?" (আজ)":"");if(h){const sm=document.createElement("small");sm.style.cssText="display:block;color:var(--muted);font-size:12px";sm.textContent=h.txt;b.children[0].appendChild(sm)}}b.children[1].textContent=fmt(v)+(v>=d?" ✓":"");
+      b.onclick=()=>openEditor(ds);list.appendChild(b)});
+    if(!valid.length)list.innerHTML='<p style="color:var(--muted);text-align:center;margin:0">এখনো কোনো হিসাব নেই</p>';
+  }
+  document.querySelectorAll("#hSeg button").forEach(b=>b.onclick=()=>{range=b.dataset.r;document.querySelectorAll("#hSeg button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));renderHistory()});
+
+  /* ---------- render: achievement ---------- */
+  let gridPage=null;
+  function renderAchieve(){
+    const t=total(),g=state.goal,d=state.daily,td=todayStr(),p=Math.min(1,t/g),N=nDays();
+    $("ringArc").setAttribute("stroke-dashoffset",(377*(1-p)).toFixed(1));
+    $("pct").textContent=bn(p>=1?100:(p*100).toFixed(p<.1?1:0))+"%";
+    $("sTotal").textContent=fmt(t);$("sLeft").textContent=fmt(Math.max(0,g-t));
+    $("sDay").textContent=bn(Math.max(1,Math.min(diff(state.start,td)+1,N)));$("sDayL").textContent="দিন চলছে ("+bn(N)+"-র মধ্যে)";
+    $("sStreak").textContent=bn(streak());
+    const box=$("medals");box.innerHTML="";let next=null;
+    STEPS.forEach((f,i)=>{const got=state.medals.includes(f),amt=Math.round(g*f);if(!got&&next==null)next=amt;
+      const el=document.createElement("div");el.className="medal "+(got?"earned":"locked");el.innerHTML=medalSVG(i)+"<b>"+fmt(amt)+"</b>";
+      el.title=got?"অর্জিত":"বাকি "+fmt(Math.max(0,amt-t));box.appendChild(el)});
+    $("medalHint").textContent=next==null?"সব অর্জিত, আলহামদুলিল্লাহ":"পরেরটি: আর "+fmt(Math.max(0,next-t))+" বার";
+    $("fullLbl").textContent=fmt(d)+" পূর্ণ";
+    const grid=$("grid");grid.innerHTML="";const PG=100,pages=Math.ceil(N/PG),ti=Math.max(0,Math.min(N-1,diff(state.start,td)));
+    if(gridPage==null||gridPage>=pages)gridPage=Math.floor(ti/PG);
+    const i0=gridPage*PG,i1=Math.min(N,i0+PG);
+    $("pager").hidden=pages<=1;$("pgPrev").disabled=gridPage<=0;$("pgNext").disabled=gridPage>=pages-1;
+    $("gridLbl").textContent=pages<=1?bn(N)+" দিনের মানচিত্র":"দিন "+bn(i0+1)+"–"+bn(i1)+" (মোট "+bn(N)+")";
+    for(let i=i0;i<i1;i++){const ds=addDays(state.start,i),v=dayTotal(ds),b=document.createElement("button");b.className="cell";b.type="button";
+      if(v>=d)b.classList.add("full");else if(v>=d/2)b.classList.add("l2");else if(v>0)b.classList.add("l1");
+      if(diff(td,ds)>0){b.classList.add("future");b.disabled=true}
+      if(ds===td)b.classList.add("today");
+      b.title="দিন "+bn(i+1)+" · "+pretty(ds)+" · "+fmt(v);b.setAttribute("aria-label",b.title);
+      b.onclick=()=>openEditor(ds);grid.appendChild(b)}
+  }
+  $("mapToggle").onclick=()=>{const c=$("mapCard"),open=c.hidden;c.hidden=!open;$("mapToggle").setAttribute("aria-expanded",String(open));$("mapToggle").textContent=open?"দিনের মানচিত্র লুকান ›":"দিনের মানচিত্র দেখুন ›"};
+  $("pgPrev").onclick=()=>{gridPage=Math.max(0,gridPage-1);renderAchieve()};
+  $("pgNext").onclick=()=>{gridPage++;renderAchieve()};
+
+  function render(){
+    if(view==="home")renderHome();
+    else if(view==="durud")renderDurud();
+    else if(view==="tasbih")renderTasbih();
+    else if(view==="history"){renderAchieve();renderHistory()}
+    else if(view==="sunnah")renderSunnah();
+  }
+
+  /* ---------- tasbih interactions ---------- */
+  $("v-tasbih").addEventListener("click",e=>{if(e.target.closest("button,select,option,a,input"))return;bump(1)});
+  document.querySelectorAll("[data-add]").forEach(b=>b.addEventListener("click",()=>bump(+b.dataset.add)));
+  $("tBack").onclick=()=>go("home");
+  $("tSel").onchange=e=>{state.cur=e.target.value;persist();stopAudio();renderTasbih()};
+  $("tSound").onclick=()=>{prefs.sound=!prefs.sound;ls.set("durud-sound",prefs.sound?"1":"0");renderTasbih();if(prefs.sound)feedback(false)};
+  $("tEdit").onclick=()=>openEditor(todayStr());
+
+  /* ---------- day editor ---------- */
+  let edDay=null;
+  function openEditor(ds){
+    edDay=ds;const o=dayObj(ds);$("edSub").textContent=prettyW(ds)+(ds===todayStr()?" (আজ)":"");
+    const box=$("edRows");box.innerHTML="";
+    DURUD.forEach(x=>{const r=document.createElement("label");r.className="erow";r.innerHTML='<i style="background:var('+colOf(x.id)+')"></i><span></span><input class="inp num" type="number" min="0" inputmode="numeric">';
+      r.children[1].textContent=x.name;const inp=r.querySelector("input");inp.id="ed-"+x.id;inp.value=o[x.id]||"";inp.placeholder="০";inp.oninput=edTot;box.appendChild(r)});
+    edTot();$("editor").hidden=false;
+  }
+  function edTot(){let t=0;DURUD.forEach(x=>{t+=Math.max(0,parseInt($("ed-"+x.id).value,10)||0)});$("edTot").textContent=fmt(t)}
+  $("edSave").onclick=()=>{const before=dayTotal(todayStr());DURUD.forEach(x=>setCount(edDay,x.id,parseInt($("ed-"+x.id).value,10)||0));$("editor").hidden=true;toast("সংরক্ষিত ✓");afterChange(before)};
+
+  /* ---------- settings ---------- */
+  const DAILY_OPTS=[100,300,500,1000,2000],GOAL_OPTS=[10000,25000,50000,100000];
+  function paintChips(id,opts,cur){const el=$(id);if(!el.childElementCount){opts.forEach(v=>{const b=document.createElement("button");b.type="button";b.className="chip";b.dataset.v=v;b.textContent=fmt(v);el.appendChild(b)})}
+    el.querySelectorAll(".chip").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.v===cur)))}
+  function renderSettings(){
+    paintChips("dailyChips",DAILY_OPTS,state.daily);paintChips("goalChips",GOAL_OPTS,state.goal);
+    $("maghribIn").value=maghrib;renderMaghrib();
+    document.querySelectorAll("#dayModeChips .chip").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.v===dayMode)));
+    document.querySelectorAll("#hijChips .chip").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.v===hijAdj)));
+    {const h=hijri(todayStr());$("hijNow").textContent=h?"অ্যাপে আজ: "+h.txt+" — এলাকার তারিখের সাথে না মিললে বদলে নিন":"এই ফোনে হিজরি তারিখ দেখানো যাচ্ছে না"}$("dailyIn").value=state.daily;$("goalIn").value=state.goal;$("startIn").value=state.start;
+    $("soundT").setAttribute("aria-pressed",String(prefs.sound));$("vibT").setAttribute("aria-pressed",String(prefs.vib));
+    document.querySelectorAll(".sw").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.theme===theme)));
+  }
+  function changed(){gridPage=null;checkMedals();persist();renderSettings();render()}
+  $("dailyChips").onclick=e=>{const b=e.target.closest(".chip");if(b){state.daily=+b.dataset.v;changed()}};
+  $("goalChips").onclick=e=>{const b=e.target.closest(".chip");if(b){state.goal=+b.dataset.v;changed()}};
+  $("dailyIn").onchange=e=>{const v=parseInt(e.target.value,10);if(v>0){state.daily=v;changed()}};
+  $("goalIn").onchange=e=>{const v=parseInt(e.target.value,10);if(v>0){state.goal=v;changed()}};
+  $("startIn").onchange=e=>{if(e.target.value){state.start=e.target.value;changed()}};
+  $("maghribIn").onchange=e=>{if(e.target.value){maghrib=e.target.value;ls.set("durud-maghrib",maghrib);jOn=null;applyJumuah();renderMaghrib();render()}};
+  $("locBtn").onclick=getLocation;
+  $("dayModeChips").onclick=e=>{const b=e.target.closest(".chip");if(b){dayMode=b.dataset.v;ls.set("durud-daymode",dayMode);lastDay=todayStr();renderSettings();render()}};
+  $("hijChips").onclick=e=>{const b=e.target.closest(".chip");if(b){hijAdj=+b.dataset.v;ls.set("durud-hijadj",String(hijAdj));renderSettings();render()}};
+  $("locOff").onclick=()=>{loc=null;try{localStorage.removeItem("durud-loc")}catch(e){}$("locMsg").textContent="";jOn=null;applyJumuah();renderMaghrib()};
+  $("soundT").onclick=()=>{prefs.sound=!prefs.sound;ls.set("durud-sound",prefs.sound?"1":"0");renderSettings()};
+  $("vibT").onclick=()=>{prefs.vib=!prefs.vib;ls.set("durud-vib",prefs.vib?"1":"0");renderSettings()};
+  $("resetBtn").onclick=()=>{$("resetConfirm").hidden=false};
+  $("resetNo").onclick=()=>{$("resetConfirm").hidden=true};
+  $("resetYes").onclick=()=>{state={start:todayStr(),daily:state.daily,goal:state.goal,days:{},medals:[],cur:state.cur,v:2};$("resetConfirm").hidden=true;changed();$("settings").hidden=true;toast("নতুন করে শুরু হলো")};
+
+  /* ---------- theme ---------- */
+  const TC={mint:"#1d6b44",deep:"#0a261c",light:"#1c6a43",dark:"#0f1211"};
+  let theme=ls.get("durud-theme")||"mint"; if(!TC[theme])theme="mint";
+  function setThemeColor(){document.querySelector('meta[name="theme-color"]').setAttribute("content",view==="tasbih"?"#0b2a1c":TC[theme])}
+  function applyTheme(t){theme=t;if(t==="deep")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",t);ls.set("durud-theme",t);setThemeColor();renderSettings();render()}
+  document.querySelectorAll(".sw").forEach(b=>b.onclick=()=>applyTheme(b.dataset.theme));
+
+  /* ---------- first run ---------- */
+  let suD=1000,suG=100000;
+  function paintSetup(){paintChips("suDaily",DAILY_OPTS,suD);paintChips("suGoal",GOAL_OPTS,suG)}
+  $("suDaily").onclick=e=>{const b=e.target.closest(".chip");if(b){suD=+b.dataset.v;paintSetup()}};
+  $("suGoal").onclick=e=>{const b=e.target.closest(".chip");if(b){suG=+b.dataset.v;paintSetup()}};
+  $("suGo").onclick=()=>{state.daily=suD;state.goal=suG;state.start=todayStr();$("setup").hidden=true;persist();render()};
+
+  /* ---------- day rollover while open ---------- */
+  /* countdown to the end of the app's day (next maghrib, or midnight) */
+  function tickDay(){
+    const tag=$("cTag");if(!tag)return;
+    if(dayTotal(todayStr())>=state.daily){tag.classList.add("done");$("dLbl").textContent="আজকের লক্ষ্য পূর্ণ ✓";$("dLeft").textContent="";return}
+    tag.classList.remove("done");
+    const n=new Date(),secs=n.getHours()*3600+n.getMinutes()*60+n.getSeconds();let end,lbl;
+    if(dayMode==="maghrib"){const m=maghribMins(n)*60;
+      if(secs<m)end=m;else{const tm=new Date(n);tm.setDate(tm.getDate()+1);end=86400+maghribMins(tm)*60}
+      lbl="মাগরিব পর্যন্ত";}
+    else{end=86400;lbl="দিন শেষ হতে"}
+    const r=Math.max(0,end-secs),p=x=>bn(String(x).padStart(2,"0"));
+    $("dLbl").textContent=lbl;$("dLeft").textContent=p(Math.floor(r/3600))+":"+p(Math.floor(r%3600/60))+":"+p(r%60);
+  }
+  setInterval(()=>{if(!document.hidden)tickDay()},1000);
+  let lastDay=todayStr();
+  setInterval(()=>{applyJumuah();const t=todayStr();if(t!==lastDay){lastDay=t;render()}},60000);
+
+  /* ---------- boot ---------- */
+  buildDurud();buildStories();buildBeads();showFaz();showJ();applyJumuah();
+  checkMedals();
+  history.replaceState(null,"");
+  showRaw("home");
+  if(firstRun){paintSetup();$("setup").hidden=false}else persist();
+  if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
+})();
+</script>
+</body>
+</html>
