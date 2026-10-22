@@ -87,6 +87,7 @@ button{font:inherit;color:inherit}
 .pbar{height:9px;border-radius:6px;background:rgba(255,255,255,.25);margin-top:10px;overflow:hidden}
 .pbar i{display:block;height:100%;background:linear-gradient(90deg,#c9a14a,#f6e2a2);border-radius:6px;transition:width .3s}
 .homebody{margin-top:-22px;position:relative}
+.nask b{display:block;font-size:15.5px;color:var(--g)}.nask p{margin:4px 0 10px;font-size:13.5px;color:var(--muted);line-height:1.55}.nask .acts{display:flex;gap:8px}
 .moti{background:linear-gradient(120deg,color-mix(in srgb,var(--goldl) 85%,var(--card)),var(--card));border:1px solid color-mix(in srgb,var(--accent) 40%,var(--line));
   border-radius:18px;padding:13px 14px;display:flex;gap:12px;align-items:flex-start;box-shadow:0 4px 14px var(--shadow)}
 .moti .mi{width:38px;height:38px;border-radius:50%;background:var(--goldl);display:flex;align-items:center;justify-content:center;font-size:19px;flex:none}
@@ -393,6 +394,7 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
         <blockquote id="jText"></blockquote><cite id="jRef"></cite></div>
       <div class="card jlist" id="jList" hidden><div class="h">জুমু'আর আমল <small id="jCount"></small></div><div class="jbar"><i id="jBar"></i></div><div class="items" id="jItems"></div></div>
       <div class="fast" id="fastCard" hidden><b id="fastT"></b><p id="fastP"></p><div class="acts"><button type="button" id="fastDone" aria-pressed="false" hidden>রোজা রেখেছি ✓</button></div></div>
+      <div class="card nask" id="nAsk" hidden><b>🔔 দিনে দুইবার মনে করিয়ে দেব?</b><p>সকাল ১০টায় আর মাগরিবের দেড় ঘণ্টা আগে, আজ কত পড়া হলো সেটা জানিয়ে।</p><div class="acts"><button class="btn primary" type="button" id="nYes">চালু করুন</button><button class="btn ghost" type="button" id="nNo">এখন না</button></div></div>
       <div class="moti" aria-live="polite"><span class="mi" id="mIcon">🌙</span><div><b id="mTitle"></b><p id="mBody"></p></div></div>
       <div class="card"><div class="h">এই সপ্তাহ <small id="streakLbl"></small></div><div class="week" id="week"></div></div>
       <div class="cont"><div class="t"><small>এখন পড়ছেন</small><b id="cName"></b><small id="cCount"></small><span class="ctag" id="cTag">🌙 <span id="dLbl">মাগরিব পর্যন্ত</span> <b class="num" id="dLeft">--:--:--</b></span><button class="pill" data-go="tasbih">চালিয়ে যান →</button></div><img src="dome.jpg" alt=""></div>
@@ -525,6 +527,7 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
     <label class="rowline"><span style="font-weight:600">শুরুর তারিখ</span><input class="inp" type="date" id="startIn"></label>
     <div class="rowline"><span style="font-weight:600">তাসবিহে শব্দ</span><button class="toggle" type="button" id="soundT" aria-pressed="false" aria-label="তাসবিহে শব্দ"></button></div>
     <div class="rowline"><span style="font-weight:600">তাসবিহে কম্পন</span><button class="toggle" type="button" id="vibT" aria-pressed="true" aria-label="তাসবিহে কম্পন"></button></div>
+    <div class="rowline"><span style="font-weight:600">দিনে দুইবার মনে করানো<small id="notifMsg" style="display:block;font-weight:400;color:var(--muted);font-size:12.5px"></small></span><button class="toggle" type="button" id="notifT" aria-pressed="false" aria-label="দিনে দুইবার মনে করানো"></button></div>
     <hr class="sep">
     <div class="rowline"><button class="btn ghost" id="resetBtn" type="button">সব মুছে নতুন করে শুরু</button>
       <span id="resetConfirm" hidden>নিশ্চিত? <button class="btn" id="resetYes" type="button">হ্যাঁ, মুছুন</button> <button class="btn ghost" id="resetNo" type="button">না</button></span></div>
@@ -587,6 +590,8 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
   const $=id=>document.getElementById(id);
   const ls={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
   let maghrib=ls.get("durud-maghrib")||"18:00";
+  const pushOK="serviceWorker" in navigator&&"PushManager" in window&&"Notification" in window;
+  let notifOn=ls.get("durud-notif")==="1";
   let loc=null; try{const l=JSON.parse(ls.get("durud-loc")||"null");if(l&&isFinite(l.lat)&&isFinite(l.lng))loc=l}catch(e){}
   /* sunset (NOAA sunrise/sunset algorithm, zenith 90.833°) → minutes after local midnight */
   function sunsetMins(date,lat,lng){
@@ -695,7 +700,11 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
     const td=todayStr(),d=state.daily;let s=0,cur=dayTotal(td)>=d?td:addDays(td,-1);
     while(diff(state.start,cur)>=0&&dayTotal(cur)>=d){s++;cur=addDays(cur,-1)}return s;
   }
-  function persist(){ls.set(LS,JSON.stringify(state))}
+  function persist(){ls.set(LS,JSON.stringify(state));mirror()}
+  /* copy of yesterday/today/tomorrow totals for the service worker, which writes the reminder text */
+  function mirror(){try{const r=indexedDB.open("durud",1);r.onupgradeneeded=()=>r.result.createObjectStore("kv");
+    r.onsuccess=()=>{try{const n=iso(new Date()),days={};for(let i=-1;i<=1;i++){const ds=addDays(n,i);days[ds]=dayTotal(ds)}
+      r.result.transaction("kv","readwrite").objectStore("kv").put({daily:state.daily,days,dayMode},"state")}catch(e){}}}catch(e){}}
 
   /* ---------- view switching ---------- */
   let view="home";
@@ -858,7 +867,7 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
     msg.textContent="লোকেশন খোঁজা হচ্ছে…";
     navigator.geolocation.getCurrentPosition(pos=>{
       loc={lat:Math.round(pos.coords.latitude*100)/100,lng:Math.round(pos.coords.longitude*100)/100};
-      ls.set("durud-loc",JSON.stringify(loc));msg.textContent="✓ এলাকা পাওয়া গেছে। লোকেশন শুধু এই ফোনেই থাকে।";jOn=null;applyJumuah();renderMaghrib();
+      ls.set("durud-loc",JSON.stringify(loc));msg.textContent=notifOn?"✓ এলাকা পাওয়া গেছে। মনে করানোর সময় ঠিক রাখতে শুধু আনুমানিক এলাকা (প্রায় ১০ কিমি) সার্ভারে যায়।":"✓ এলাকা পাওয়া গেছে। লোকেশন শুধু এই ফোনেই থাকে।";notifResync();jOn=null;applyJumuah();renderMaghrib();
     },err=>{
       msg.textContent=err&&err.code===1?"লোকেশনের অনুমতি দেওয়া হয়নি। ফোনের সেটিংস থেকে অনুমতি দিন, অথবা নিচে নিজে সময় লিখুন।":"লোকেশন পাওয়া যায়নি। একটু পরে আবার চেষ্টা করুন, অথবা নিচে নিজে সময় লিখুন।";
     },{enableHighAccuracy:false,timeout:15000,maximumAge:864e5});
@@ -1251,6 +1260,8 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
     document.querySelectorAll("#hijChips .chip").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.v===hijAdj)));
     {const h=hijri(todayStr());$("hijNow").textContent=h?"অ্যাপে আজ: "+h.txt+" — এলাকার তারিখের সাথে না মিললে বদলে নিন":"এই ফোনে হিজরি তারিখ দেখানো যাচ্ছে না"}$("dailyIn").value=state.daily;$("goalIn").value=state.goal;$("startIn").value=state.start;
     $("soundT").setAttribute("aria-pressed",String(prefs.sound));$("vibT").setAttribute("aria-pressed",String(prefs.vib));
+    {const perm=pushOK?Notification.permission:"x";$("notifT").setAttribute("aria-pressed",String(notifOn&&perm==="granted"));
+     $("notifMsg").textContent=!pushOK?"এই ফোনে চালু করা যাচ্ছে না। iPhone হলে আগে অ্যাপটা Home Screen-এ যোগ করুন।":perm==="denied"?"ফোনের সেটিংসে এই অ্যাপের নোটিফিকেশন বন্ধ আছে, সেখান থেকে চালু করুন।":"সকাল ১০টা আর মাগরিবের দেড় ঘণ্টা আগে"}
     document.querySelectorAll(".sw").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.theme===theme)));
   }
   function changed(){gridPage=null;checkMedals();persist();renderSettings();render()}
@@ -1259,11 +1270,11 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
   $("dailyIn").onchange=e=>{const v=parseInt(e.target.value,10);if(v>0){state.daily=v;changed()}};
   $("goalIn").onchange=e=>{const v=parseInt(e.target.value,10);if(v>0){state.goal=v;changed()}};
   $("startIn").onchange=e=>{if(e.target.value){state.start=e.target.value;changed()}};
-  $("maghribIn").onchange=e=>{if(e.target.value){maghrib=e.target.value;ls.set("durud-maghrib",maghrib);jOn=null;applyJumuah();renderMaghrib();render()}};
+  $("maghribIn").onchange=e=>{if(e.target.value){maghrib=e.target.value;ls.set("durud-maghrib",maghrib);notifResync();jOn=null;applyJumuah();renderMaghrib();render()}};
   $("locBtn").onclick=getLocation;
-  $("dayModeChips").onclick=e=>{const b=e.target.closest(".chip");if(b){dayMode=b.dataset.v;ls.set("durud-daymode",dayMode);lastDay=todayStr();renderSettings();render()}};
+  $("dayModeChips").onclick=e=>{const b=e.target.closest(".chip");if(b){dayMode=b.dataset.v;ls.set("durud-daymode",dayMode);lastDay=todayStr();mirror();renderSettings();render()}};
   $("hijChips").onclick=e=>{const b=e.target.closest(".chip");if(b){hijAdj=+b.dataset.v;ls.set("durud-hijadj",String(hijAdj));renderSettings();render()}};
-  $("locOff").onclick=()=>{loc=null;try{localStorage.removeItem("durud-loc")}catch(e){}$("locMsg").textContent="";jOn=null;applyJumuah();renderMaghrib()};
+  $("locOff").onclick=()=>{loc=null;try{localStorage.removeItem("durud-loc")}catch(e){}$("locMsg").textContent="";jOn=null;applyJumuah();renderMaghrib();notifResync()};
   $("soundT").onclick=()=>{prefs.sound=!prefs.sound;ls.set("durud-sound",prefs.sound?"1":"0");renderSettings()};
   $("vibT").onclick=()=>{prefs.vib=!prefs.vib;ls.set("durud-vib",prefs.vib?"1":"0");renderSettings()};
   $("resetBtn").onclick=()=>{$("resetConfirm").hidden=false};
@@ -1299,6 +1310,31 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
     $("dLbl").textContent=lbl;$("dLeft").textContent=p(Math.floor(r/3600))+":"+p(Math.floor(r%3600/60))+":"+p(r%60);
   }
   setInterval(()=>{if(!document.hidden)tickDay()},1000);
+  /* ---------- daily reminders (web push) ---------- */
+  const b64u=s=>{s=s.replace(/-/g,"+").replace(/_/g,"/");const r=atob(s+"===".slice((s.length+3)%4));return Uint8Array.from(r,c=>c.charCodeAt(0))};
+  const r1=v=>Math.round(v*10)/10;
+  function pushSync(sub){return fetch("api/subscribe",{method:"POST",headers:{"content-type":"application/json"},
+    body:JSON.stringify({sub:sub.toJSON(),tz:Intl.DateTimeFormat().resolvedOptions().timeZone,lat:loc?r1(loc.lat):null,lng:loc?r1(loc.lng):null,maghrib})}).then(r=>{if(!r.ok)throw 0})}
+  async function notifEnable(){
+    if(!pushOK){toast("এই ফোনে চালু করা যাচ্ছে না। iPhone হলে আগে Home Screen-এ যোগ করুন।");return false}
+    const p=await Notification.requestPermission();
+    if(p!=="granted"){toast("নোটিফিকেশনের অনুমতি দেওয়া হয়নি");return false}
+    try{const reg=await navigator.serviceWorker.ready;let sub=await reg.pushManager.getSubscription();
+      if(!sub){const k=(await (await fetch("api/vapid",{cache:"no-store"})).json()).key;if(!k)throw 0;
+        sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64u(k)})}
+      await pushSync(sub);notifOn=true;ls.set("durud-notif","1");mirror();toast("ইনশাআল্লাহ দিনে দুইবার মনে করিয়ে দেব");return true}
+    catch(e){toast("এখন চালু করা গেল না। ইন্টারনেট দেখে আবার চেষ্টা করুন।");return false}
+  }
+  async function notifDisable(){notifOn=false;ls.set("durud-notif","0");
+    try{const reg=await navigator.serviceWorker.ready,sub=await reg.pushManager.getSubscription();
+      if(sub){fetch("api/subscribe",{method:"DELETE",headers:{"content-type":"application/json"},body:JSON.stringify({sub:sub.toJSON()})}).catch(()=>{});await sub.unsubscribe()}}catch(e){}}
+  function notifResync(){if(!notifOn||!pushOK||Notification.permission!=="granted")return;
+    navigator.serviceWorker.ready.then(r=>r.pushManager.getSubscription()).then(s=>s&&pushSync(s)).catch(()=>{})}
+  function renderAsk(){$("nAsk").hidden=!(pushOK&&Notification.permission==="default"&&!notifOn&&ls.get("durud-notif-ask")!=="no")}
+  $("notifT").onclick=async()=>{if(notifOn&&Notification.permission==="granted")await notifDisable();else await notifEnable();renderSettings();renderAsk()};
+  $("nYes").onclick=async()=>{await notifEnable();renderAsk()};
+  $("nNo").onclick=()=>{ls.set("durud-notif-ask","no");renderAsk()};
+  renderAsk();mirror();notifResync();
   let lastDay=todayStr();
   setInterval(()=>{applyJumuah();const t=todayStr();if(t!==lastDay){lastDay=t;render()}},60000);
 
