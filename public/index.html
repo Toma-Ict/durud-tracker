@@ -20,6 +20,11 @@
 @font-face{font-family:"Uthmani";src:url("uthmani.woff2") format("woff2");font-display:swap}
 /* ﷺ only (Bengali fonts draw it badly) — Amiri subset, OFL */
 @font-face{font-family:"Saw";src:url("saw.woff2") format("woff2");unicode-range:U+FDFA;font-display:swap}
+/* Bengali digits only, from Noto Sans Bengali (OFL): Hind Siliguri's ১ looks like ৯ */
+@font-face{font-family:"BnNum";src:url("bn-num-400.woff2") format("woff2");font-weight:400;unicode-range:U+09E6-09EF;font-display:swap}
+@font-face{font-family:"BnNum";src:url("bn-num-500.woff2") format("woff2");font-weight:500;unicode-range:U+09E6-09EF;font-display:swap}
+@font-face{font-family:"BnNum";src:url("bn-num-600.woff2") format("woff2");font-weight:600;unicode-range:U+09E6-09EF;font-display:swap}
+@font-face{font-family:"BnNum";src:url("bn-num-700.woff2") format("woff2");font-weight:700;unicode-range:U+09E6-09EF;font-display:swap}
 /* Layout: one view at a time (home, durud, tasbih, history, achievement) above a fixed bottom tab bar with a raised tasbih button */
 /* Theme tokens. Bare :root = "deep" (emerald + gold); mint is the default for new users */
 :root{
@@ -28,7 +33,7 @@
   --d1:#d6b25e; --d2:#6fbf8f; --d3:#f3e0a6; --d4:#3c8f70; --d5:#8a9a90; --navbg:#0d2e21; --shadow:rgba(0,0,0,.35);
   --gold-hi:#f6e2a2; --gold-lo:#b08a3a;
   --f-display:"Saw","Noto Serif Bengali","Hind Siliguri",serif;
-  --f-body:"Saw","Hind Siliguri",system-ui,sans-serif;
+  --f-body:"Saw","BnNum","Hind Siliguri",system-ui,sans-serif;
   --f-arabic:"Uthmani","Amiri","Traditional Arabic",serif;
   color-scheme:dark;
 }
