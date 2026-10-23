@@ -82,10 +82,12 @@ button{font:inherit;color:inherit}
   padding:calc(14px + env(safe-area-inset-top,0px)) max(18px,env(safe-area-inset-right,0px)) 40px max(18px,env(safe-area-inset-left,0px))}
 .hero::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,38,24,.62) 0%,rgba(8,38,24,.72) 50%,rgba(8,38,24,.9) 100%)}
 .hero>*{position:relative}
-.hero .top{display:flex;justify-content:space-between;align-items:center;font-size:13px;opacity:.92}
+.hero .top{display:flex;justify-content:space-between;align-items:center;font-size:13px}
 .hero .iconbtn{background:rgba(255,255,255,.18);color:#fff}
-.hdate{margin-top:6px;font-size:13px;color:#f6e2a2;opacity:.95}
-.hdate span{color:#fff;opacity:.85}
+.dpill{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(90deg,#d6b25e,#f6e2a2);color:#124a2f;border-radius:999px;padding:3px 12px;font-size:13px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.hdate{margin-top:8px}
+.hdate b{display:block;font-family:var(--f-display);font-weight:700;font-size:13.5px;color:#f6e2a2;line-height:1.45}
+.hdate small{display:block;font-size:12px;color:#fff;opacity:.88;margin-top:1px}
 .salam{font-size:21px;margin-top:8px;color:#f6e2a2;line-height:1.7}
 .big{font-family:var(--f-display);font-size:50px;font-weight:800;line-height:1.1;margin-top:2px}
 .big small{font-size:18px;opacity:.85;font-weight:600;font-family:var(--f-body)}
@@ -387,8 +389,8 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
   <!-- HOME -->
   <section class="view" id="v-home">
     <div class="hero">
-      <div class="top"><span id="heroDay">দুরুদের সফর</span><button class="iconbtn" data-open="settings" aria-label="সেটিংস"><svg><use href="#i-set"/></svg></button></div>
-      <div class="hdate" id="hDate"></div>
+      <div class="top"><span id="heroDay" class="dpill">📿 দুরুদের সফর</span><button class="iconbtn" data-open="settings" aria-label="সেটিংস"><svg><use href="#i-set"/></svg></button></div>
+      <div class="hdate" id="hDate"><b id="hHij"></b><small id="hGreg"></small></div>
       <div class="jbadge" id="jBadge" hidden>✦ জুমু'আ মুবারক ✦</div>
       <div class="salam ar">السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللّٰهِ وَبَرَكَاتُهُ</div>
       <div class="big num"><span id="hCount">০</span> <small id="hGoal">/ ১,০০০ আজ</small></div>
@@ -589,6 +591,9 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
   const realToday=()=>iso(new Date());
   const MONTHS=["জানু","ফেব্রু","মার্চ","এপ্রি","মে","জুন","জুলাই","আগ","সেপ্টে","অক্টো","নভে","ডিসে"];
   const WD=["রবি","সোম","মঙ্গল","বুধ","বৃহঃ","শুক্র","শনি"];
+  const MONF=["জানুয়ারি","ফেব্রুয়ারি","মার্চ","এপ্রিল","মে","জুন","জুলাই","আগস্ট","সেপ্টেম্বর","অক্টোবর","নভেম্বর","ডিসেম্বর"];
+  const YAWM=["ইয়াওমুল আহাদ","ইয়াওমুল ইসনাইন","ইয়াওমুস সুলাসা","ইয়াওমুল আরবিআ","ইয়াওমুল খামিস","ইয়াওমুল জুমু'আ","ইয়াওমুস সাবত"];
+  const LAYL=["লাইলাতুল আহাদ","লাইলাতুল ইসনাইন","লাইলাতুস সুলাসা","লাইলাতুল আরবিআ","লাইলাতুল খামিস","লাইলাতুল জুমু'আ","লাইলাতুস সাবত"];
   const WDF=["রবিবার","সোমবার","মঙ্গলবার","বুধবার","বৃহস্পতিবার","শুক্রবার","শনিবার"];
   const pretty=s=>{const d=parse(s);return bn(d.getDate())+" "+MONTHS[d.getMonth()]};
   const prettyW=s=>WD[parse(s).getDay()]+", "+pretty(s);
@@ -1092,10 +1097,13 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
   /* ---------- render: home ---------- */
   function renderHome(){
     const td=todayStr(),t=dayTotal(td),d=state.daily;
-    $("heroDay").textContent="দুরুদের সফর · দিন "+bn(Math.max(1,diff(state.start,td)+1));
+    $("heroDay").textContent="📿 দুরুদের সফর · দিন "+bn(Math.max(1,diff(state.start,td)+1));
     {const h=hijri(td),night=dayMode==="maghrib"&&afterMaghrib();
-     $("hDate").innerHTML="";const a=document.createElement("b");a.textContent=h?h.txt:"";const b=document.createElement("span");
-     b.textContent=(h?" · ":"")+WDF[parse(td).getDay()]+(night?" রাত":"")+", "+pretty(td);$("hDate").append(a,b)}
+     /* Islamic day name follows the app's day (after maghrib it is already the next day's night);
+        the Gregorian line shows the calendar date the user is living in */
+     $("hHij").textContent=(h?h.txt+" হি. · ":"")+(night?LAYL:YAWM)[parse(td).getDay()]+" 🌙";
+     const cal=night?parse(iso(new Date())):parse(td);
+     $("hGreg").textContent=WDF[cal.getDay()]+(night?" রাত":"")+", "+bn(cal.getDate())+" "+MONF[cal.getMonth()]}
     $("hCount").textContent=fmt(t);$("hGoal").textContent="/ "+fmt(d)+" আজ";
     $("hBar").style.width=Math.min(100,t/d*100)+"%";
     motivation();renderFast();

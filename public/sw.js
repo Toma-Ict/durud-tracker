@@ -1,6 +1,6 @@
 // Network-first: always try the live site so updates (icons, fixes) arrive at once;
 // fall back to the saved copy only when offline.
-const CACHE = "durud-v30";
+const CACHE = "durud-v31";
 const CORE = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png", "dome.jpg", "hero.jpg", "uthmani.woff2", "saw.woff2", "splash.webp", "badge-96.png", "bn-num-400.woff2", "bn-num-500.woff2", "bn-num-600.woff2", "bn-num-700.woff2"];
 
 self.addEventListener("install", e => {
