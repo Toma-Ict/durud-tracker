@@ -1,6 +1,6 @@
 // Network-first: always try the live site so updates (icons, fixes) arrive at once;
 // fall back to the saved copy only when offline.
-const CACHE = "durud-v31";
+const CACHE = "durud-v32";
 const CORE = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png", "dome.jpg", "hero.jpg", "uthmani.woff2", "saw.woff2", "splash.webp", "badge-96.png", "bn-num-400.woff2", "bn-num-500.woff2", "bn-num-600.woff2", "bn-num-700.woff2"];
 
 self.addEventListener("install", e => {
@@ -50,13 +50,13 @@ function readMirror() {
 }
 
 function compose(kind, m) {
-  if (!m || !m.daily) return ["🌙 দুরুদ", "আজকের দুরুদ পড়েছেন? একটু সময় নিয়ে পড়ে নিন, প্রিয় নবীজী (সা.)-এর জন্য।"];
+  if (!m || !m.daily) return ["🌙 দুরুদ", "আজকের দুরুদ পড়েছেন? একটু সময় নিয়ে পড়ে নিন, প্রিয় নবীজী ﷺ-এর জন্য।"];
   const t = (m.days && m.days[isoLocal(new Date())]) || 0, d = m.daily, left = d - t;
   const before = m.dayMode === "midnight" ? "আজকের মধ্যে" : "মাগরিবের আগে";
   if (t >= d) return ["🏆 আলহামদুলিল্লাহ! আজকের " + bn(d) + " পূর্ণ", "চাইলে আরেকটু পড়তে পারেন।"];
   if (t > 0) return ["📿 মাশাআল্লাহ! " + bn(t) + " হয়েছে",
     kind === "evening" ? "আর মাত্র " + bn(left) + " বাকি। " + before + " পূর্ণ করে ফেলুন ইনশাআল্লাহ।" : "আর " + bn(left) + " বাকি। আজকের লক্ষ্য পূরণে এগিয়ে চলুন।"];
-  return ["🌙 দুরুদ", kind === "evening" ? before + " এখনো সময় আছে। আজকের দুরুদ পড়া শুরু করুন।" : "আজকের দুরুদ পড়া এখনো শুরু হয়নি। একটু সময় নিয়ে শুরু করুন, প্রিয় নবীজী (সা.)-এর জন্য।"];
+  return ["🌙 দুরুদ", kind === "evening" ? before + " এখনো সময় আছে। আজকের দুরুদ পড়া শুরু করুন।" : "আজকের দুরুদ পড়া এখনো শুরু হয়নি। একটু সময় নিয়ে শুরু করুন, প্রিয় নবীজী ﷺ-এর জন্য।"];
 }
 
 self.addEventListener("push", e => {
