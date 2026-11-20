@@ -112,8 +112,9 @@ button{font:inherit;color:inherit}
 .cont .t{padding:14px;flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
 .cont small{opacity:.82;font-size:12.5px}.cont b{font-size:18px}
 .pill{align-self:flex-start;background:#fff;color:#1d6b44;border:0;border-radius:999px;padding:6px 14px;font-size:13.5px;font-weight:700;margin-top:auto;cursor:pointer}
-.ctag{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;background:linear-gradient(90deg,#d6b25e,#f6e2a2);color:#124a2f;border-radius:10px;padding:3px 10px;font-size:12.5px;font-weight:700;margin:6px 0 8px}
+.ctag{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;flex-wrap:nowrap;align-self:flex-start;background:linear-gradient(90deg,#d6b25e,#f6e2a2);color:#124a2f;border-radius:10px;padding:3px 10px;font-size:12.5px;font-weight:700;margin:6px 0 8px}
 .cont .ctag b{font-size:14.5px;font-family:var(--f-display);font-weight:800;letter-spacing:.4px}
+.cont .ctag b i{font-style:normal;display:inline-block;text-align:center}.cont .ctag b .cd{width:.62em}.cont .ctag b .cs{width:.34em}
 .ctag.done{background:rgba(255,255,255,.18);color:#fff}
 .cont img{width:42%;max-width:170px;object-fit:cover;-webkit-mask-image:linear-gradient(90deg,transparent,#000 40%);mask-image:linear-gradient(90deg,transparent,#000 40%)}
 .rows{display:flex;flex-direction:column;gap:2px;margin-top:6px}
@@ -1468,7 +1469,9 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
       lbl="মাগরিব পর্যন্ত";}
     else{end=86400;lbl="দিন শেষ হতে"}
     const r=Math.max(0,end-secs),p=x=>bn(String(x).padStart(2,"0"));
-    $("dLbl").textContent=lbl;$("dLeft").textContent=p(Math.floor(r/3600))+":"+p(Math.floor(r%3600/60))+":"+p(r%60);
+    $("dLbl").textContent=lbl;
+    /* each digit in a fixed-width box so the tag does not grow and shrink every second */
+    $("dLeft").innerHTML=(p(Math.floor(r/3600))+":"+p(Math.floor(r%3600/60))+":"+p(r%60)).split("").map(ch=>ch===":"?'<i class="cs">:</i>':'<i class="cd">'+ch+'</i>').join("");
   }
   setInterval(()=>{if(!document.hidden)tickDay()},1000);
   /* ---------- daily reminders (web push) ---------- */
