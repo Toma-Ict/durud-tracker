@@ -418,7 +418,7 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
       <div class="fast" id="fastCard" hidden><b id="fastT"></b><p id="fastP"></p><div class="acts"><button type="button" id="fastDone" aria-pressed="false" hidden>রোজা রেখেছি ✓</button></div></div>
       <div class="card nask" id="nAsk" hidden><b>🔔 দিনে দুইবার মনে করিয়ে দেব?</b><p>সকাল ১০টায় আর মাগরিবের দেড় ঘণ্টা আগে, আজ কত পড়া হলো সেটা জানিয়ে।</p><div class="acts"><button class="btn primary" type="button" id="nYes">চালু করুন</button><button class="btn ghost" type="button" id="nNo">এখন না</button></div></div>
       <div class="moti" aria-live="polite"><span class="mi" id="mIcon">🌙</span><div><b id="mTitle"></b><p id="mBody"></p></div></div>
-      <div class="zk" id="zkCard"><div class="t"><b>🤲 দু'আ কবুলের সিক্রেট</b><span class="n num" id="zkN">০ <small>/ ১০০</small></span></div>
+      <div class="zk" id="zkCard"><div class="t"><b>দু'আ কবুলের সিক্রেট</b><span class="n num" id="zkN">০ <small>/ ১০০</small></span></div>
         <p class="ar" id="zkAr"></p><div class="bar"><i id="zkBar" style="width:0"></i></div>
         <div class="acts"><small id="zkMsg" style="color:var(--muted)"></small><button class="pill" type="button" id="zkGo" style="background:var(--g);color:#fff">পড়ুন →</button></div></div>
       <div class="card"><div class="h">এই সপ্তাহ <small id="streakLbl"></small></div><div class="week" id="week"></div></div>
@@ -821,7 +821,7 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
   function bump(delta){
     if(zMode){const td=todayStr(),c=zkGet(td);if(delta<0&&c===0)return;zkSet(td,c+delta);const now=zkGet(td);
       if(delta>0)feedback(now%33===0||now===ZIKR.goal);persist();renderTasbih();
-      if(c<ZIKR.goal&&now>=ZIKR.goal){stars(2600);toast("মা শা আল্লহ! আজকের ১০০ বার পূর্ণ 🤲")}
+      if(c<ZIKR.goal&&now>=ZIKR.goal){stars(2600);toast("মা শা আল্লহ! আজকের ১০০ বার পূর্ণ")}
       const n=$("tN");n.classList.remove("bump");void n.offsetWidth;n.classList.add("bump");return}
     const td=todayStr(),before=dayTotal(td),cur=dayObj(td)[state.cur]||0;
     if(delta<0&&cur===0)return;
@@ -1222,7 +1222,7 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
   /* ---------- render: tasbih ---------- */
   function buildBeads(){let h="";for(let i=0;i<33;i++){const a=-Math.PI/2+2*Math.PI*i/33;h+='<circle cx="'+(125+108*Math.cos(a)).toFixed(1)+'" cy="'+(125+108*Math.sin(a)).toFixed(1)+'" r="6"/>'}$("beads").innerHTML=h;
     const sel=$("tSel");DURUD.forEach(x=>{const o=document.createElement("option");o.value=x.id;o.textContent=x.name;sel.appendChild(o)});
-    {const o=document.createElement("option");o.value="zikr";o.textContent="🤲 "+ZIKR.name+" (১০০ বার)";sel.appendChild(o)}}
+    {const o=document.createElement("option");o.value="zikr";o.textContent=ZIKR.name+" (১০০ বার)";sel.appendChild(o)}}
   function renderTasbih(){
     const td=todayStr(),cur=DBY[state.cur],c=zMode?zkGet(td):(dayObj(td)[cur.id]||0);
     $("v-tasbih").classList.toggle("zmode",zMode);$("zFaz").hidden=!zMode;$("zMean").hidden=!zMode;
@@ -1363,7 +1363,7 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
       if(i<rows.length-1){c.strokeStyle="rgba(255,255,255,.15)";c.setLineDash([8,8]);c.lineWidth=2;c.beginPath();c.moveTo(bx+30,ry+66);c.lineTo(bx+bw-30,ry+66);c.stroke();c.setLineDash([])}
       ry+=66});
     y+=bh+28;rr(c,bx,y,bw,96,28);c.fillStyle="rgba(246,226,162,.14)";c.fill();c.strokeStyle="rgba(246,226,162,.5)";c.lineWidth=2;c.stroke();
-    c.textAlign="left";c.fillStyle="#fff";c.font="600 34px "+BODY;c.fillText("🤲 "+ZIKR.name,bx+34,y+60);
+    c.textAlign="left";c.fillStyle="#fff";c.font="600 34px "+BODY;c.fillText(ZIKR.name,bx+34,y+60);
     c.textAlign="right";c.fillStyle="#f6e2a2";c.font="700 36px "+BODY;c.fillText(fmt(z)+" / "+fmt(ZIKR.goal)+(z>=ZIKR.goal?" ✓":""),bx+bw-34,y+60);
     y+=96+64;c.font="400 30px "+BODY;c.fillStyle="rgba(255,255,255,.78)";
     c.textAlign="left";c.fillText(goalMode==="daily"?"পূর্ণ দিন: "+bn(fullDays()):"মোট জমা: "+fmt(total()),bx+10,y);
