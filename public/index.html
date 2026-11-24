@@ -260,6 +260,7 @@ button{font:inherit;color:inherit}
 .sit .t{flex:1;min-width:0}.sit b{font-size:15.5px;display:block}.sit p{margin:2px 0 0;font-size:12.5px;color:var(--muted);line-height:1.55}
 .wk{display:flex;gap:5px;margin-top:6px}.wk i{width:10px;height:10px;border-radius:50%;background:var(--gl)}.wk i.on{background:var(--g)}.wk i.tdy{box-shadow:0 0 0 1.5px var(--accent)}
 .subs{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+.sit p.note{color:#9a7a2c;font-size:12px;margin-top:3px}.sit p.live{color:var(--g);font-weight:600;font-size:12.5px;margin-top:4px}
 .sub{font-size:12.5px;border-radius:999px;padding:3px 11px;border:1px solid var(--line);background:var(--bg);color:var(--muted);cursor:pointer}
 .sub[aria-pressed="true"]{background:var(--gl);color:var(--g);border-color:var(--gl);font-weight:600}
 .srow{display:flex;gap:10px;align-items:center;padding:8px 2px;font-size:14.5px;width:100%;border:0;background:none;text-align:left;cursor:pointer;border-bottom:1px solid var(--line)}
@@ -562,6 +563,7 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
     <div class="field"><span>হিজরি তারিখ</span><div class="chips" id="hijChips"><button class="chip" type="button" data-v="-2">−২</button><button class="chip" type="button" data-v="-1">−১ (বাংলাদেশ)</button><button class="chip" type="button" data-v="0">০ (সৌদি)</button><button class="chip" type="button" data-v="1">+১</button></div>
       <small style="color:var(--muted)" id="hijNow"></small></div>
     <label class="rowline"><span style="font-weight:600">শুরুর তারিখ</span><input class="inp" type="date" id="startIn"></label>
+    <div class="rowline" style="flex-wrap:nowrap;gap:12px"><span style="font-weight:600;flex:1;min-width:0">দু'আ কবুলের সিক্রেট<small style="display:block;font-weight:400;color:var(--muted);font-size:12.5px">বন্ধ করলে হোম ও কার্ডে থাকবে না, কার্ডে নিত্যদিনের সুন্নাহ দেখাবে</small></span><button class="toggle" type="button" id="zkT" style="flex:none" aria-pressed="true" aria-label="দু'আ কবুলের সিক্রেট"></button></div>
     <div class="rowline"><span style="font-weight:600">তাসবিহে শব্দ</span><button class="toggle" type="button" id="soundT" aria-pressed="false" aria-label="তাসবিহে শব্দ"></button></div>
     <div class="rowline"><span style="font-weight:600">তাসবিহে কম্পন</span><button class="toggle" type="button" id="vibT" aria-pressed="true" aria-label="তাসবিহে কম্পন"></button></div>
     <div class="rowline" id="notifRow" hidden><span style="font-weight:600">দিনে দুইবার মনে করানো<small id="notifMsg" style="display:block;font-weight:400;color:var(--muted);font-size:12.5px"></small></span><button class="toggle" type="button" id="notifT" aria-pressed="false" aria-label="দিনে দুইবার মনে করানো"></button></div>
@@ -752,7 +754,11 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
   /* "daily": progress = days that reached the daily goal (kafela competition); "lakh": old total-goal mode */
   let goalMode=ls.get("durud-goalmode")==="lakh"?"lakh":"daily";
   /* tasbih can count durud or the separate daily zikr; zikr never adds to durud totals */
-  let zMode=ls.get("durud-tmode")==="zikr";
+  /* দু'আ কবুলের সিক্রেট চালু/বন্ধ (ডিফল্ট চালু)। ?k=sunnah লিংকে প্রথমবার খুললে বন্ধ + লক্ষ্য ১০০ */
+  const K=new URLSearchParams(location.search).get("k");
+  if(K&&!ls.get("durud-k")){ls.set("durud-k",K);if(K==="sunnah")ls.set("durud-zk","0");if(K==="nusuk")ls.set("durud-zk","1")}
+  let zkOn=ls.get("durud-zk")!=="0";
+  let zMode=zkOn&&ls.get("durud-tmode")==="zikr";
   const ZIKR={name:"দু'আ কবুলের সিক্রেট",goal:100,
     ar:"لَا إِلٰهَ إِلَّا اللّٰهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلٰى كُلِّ شَيْءٍ قَدِيرٌ",
     mean:"অর্থ: একমাত্র আল্লাহ ছাড়া কোনো হক্ব ইলাহ নেই, তাঁর কোনো শরীক নেই; রাজত্ব তাঁরই, প্রশংসাও তাঁরই; আর তিনি সকল কিছুর ওপর ক্ষমতাবান।"};
@@ -1084,16 +1090,18 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
 
   /* ---------- Sunnah revival ---------- */
   const SMAIN=[
-    {id:"salam",t:"আগে সালাম দেওয়া, সালামের প্রসার",q:"“তোমরা পরস্পরে সালামের প্রসার ঘটাও।” · মুসলিম ৫৪"},
-    {id:"miswak",t:"মিসওয়াক করা",q:"“উম্মতের কষ্ট না হলে প্রতি নামাজে মিসওয়াকের আদেশ দিতাম।” · বুখারি ৮৮৭"},
-    {id:"azan",t:"আজানের জবাব দেওয়া",q:"মুয়াজ্জিন যা বলে, তা-ই বলা · মুসলিম ৩৮৩"},
-    {id:"masnun",t:"মাসনুন আমল",q:"সারাদিনের মাসনুন দু'আ ও যিকির",subs:[["sokal","সকাল"],["sondha","সন্ধ্যা"],["ghum","ঘুমের আগে"]]},
-    {id:"itr",t:"আতর ব্যবহার করা",q:"“দুনিয়ার মধ্যে আমার কাছে প্রিয় করে দেওয়া হয়েছে নারী ও সুগন্ধি, আর নামাজে রাখা হয়েছে আমার চোখের শীতলতা।” · নাসাঈ ৩৯৩৯"},
-    {id:"surma",t:"সুরমা লাগানো",q:"“তোমাদের সুরমার মধ্যে উত্তম হলো ইসমিদ, তা দৃষ্টি পরিষ্কার করে ও পাপড়ি গজায়।” · আবু দাউদ ৩৮৭৮"}
+    {id:"salam",t:"সালামের প্রসার করা",n:"ছোট বড় সবাইকে আগে সালাম দেওয়া",q:"“তোমরা পরস্পরে সালামের প্রসার ঘটাও।” · মুসলিম ৫৪"},
+    {id:"miswak",t:"প্রত্যেক সালাতের আগে মিসওয়াক করা",q:"“উম্মতের কষ্ট না হলে প্রতি নামাজে মিসওয়াকের আদেশ দিতাম।” · বুখারি ৮৮৭"},
+    {id:"awwal",t:"৫ ওয়াক্ত সালাত আওয়াল ওয়াক্তে আদায় করা",q:"আল্লহর কাছে সবচেয়ে প্রিয় আমল: সময়মতো সালাত · বুখারি ৫২৭",subs:[["fajr","ফজর"],["zuhr","যোহর"],["asr","আসর"],["magh","মাগরিব"],["isha","ইশা"]]},
+    {id:"masnun",t:"সকাল-সন্ধ্যার মাসনুন আমল, রাতে সূরা মুলক",q:"নবীজী ﷺ সূরা সাজদা ও সূরা মুলক না পড়ে ঘুমাতেন না · তিরমিযি ২৮৯২",subs:[["sokal","সকাল"],["sondha","সন্ধ্যা"],["mulk","সূরা মুলক"]]},
+    {id:"hizb",t:"হিযব আদায় করা",n:"প্রতিদিন কমপক্ষে এক পৃষ্ঠা হলেও কুরআন তিলাওয়াত",q:"ঘুমের কারণে হিযব ছুটে গেলে ফজর ও যোহরের মাঝে পড়ে নিলে রাতে পড়ার মতোই লেখা হয় · মুসলিম ৭৪৭"},
+    {id:"itr",t:"আতর ব্যবহার করা",n:"নন-মাহরামের সামনে ও বাইরে বের হলে আতর ব্যবহার নিষিদ্ধ · আবু দাউদ ৪১৭৩",q:"“দুনিয়ার মধ্যে আমার কাছে প্রিয় করে দেওয়া হয়েছে নারী ও সুগন্ধি, আর নামাজে রাখা হয়েছে আমার চোখের শীতলতা।” · নাসাঈ ৩৯৩৯"},
+    {id:"istighfar",t:"১০০ বার ইস্তেগফার",q:"“আমি দিনে আল্লহর কাছে ১০০ বার তাওবা করি।” · মুসলিম ২৭০২"},
+    {id:"surma",t:"রাতে চোখে ৩ বার করে সুরমা লাগানো",q:"“তোমাদের সুরমার মধ্যে উত্তম হলো ইসমিদ, তা দৃষ্টি পরিষ্কার করে ও পাপড়ি গজায়।” · আবু দাউদ ৩৮৭৮"}
   ];
-  const SU_SHORT={salam:"সালাম",miswak:"মিসওয়াক",azan:"আজানের জবাব",masnun:"মাসনুন আমল",sadaqah:"সাদাকাহ",itr:"আতর",surma:"সুরমা"};
+  const SU_SHORT={salam:"সালাম",miswak:"মিসওয়াক",awwal:"আওয়াল ওয়াক্তে স্বলাত",masnun:"মাসনুন আমল",hizb:"হিযব",istighfar:"ইস্তেগফার",durud100:"১০০ দুরুদ",sadaqah:"সাদাকাহ",itr:"আতর",surma:"সুরমা"};
   const SMORE=[
-    ["দৈনন্দিন",[["d1","আজানের পর দু'আ পড়া","বুখারি ৬১৪"],["d2","ওযুর পর কালিমায়ে শাহাদাত","মুসলিম ২৩৪"],["d3","সব কাজ ডান দিক থেকে শুরু","বুখারি ১৬৮"],["d4","ঘরে ঢোকার সময় আল্লহর নাম নেওয়া","মুসলিম ২০১৮"],["d5","সাইয়্যিদুল ইস্তিগফার","বুখারি ৬৩০৬"],["d6","ফজরের আগে দুই রাকাত সুন্নাত","মুসলিম ৭২৫"],["d7","দুহা / ইশরাকের নামাজ","মুসলিম ৭২০"],["d8","অল্প হলেও সাদাকাহ","বুখারি ১৪১৭"]]],
+    ["দৈনন্দিন",[["d1","আজানের পর দু'আ পড়া","বুখারি ৬১৪"],["d2","ওযুর পর কালিমায়ে শাহাদাত","মুসলিম ২৩৪"],["d3","সব কাজ ডান দিক থেকে শুরু","বুখারি ১৬৮"],["d4","ঘরে ঢোকার সময় আল্লহর নাম নেওয়া","মুসলিম ২০১৮"],["d5","সাইয়্যিদুল ইস্তিগফার","বুখারি ৬৩০৬"],["d6","ফজরের আগে দুই রাকাত সুন্নাত","মুসলিম ৭২৫"],["d7","দুহা / ইশরাকের নামাজ","মুসলিম ৭২০"],["d8","অল্প হলেও সাদাকাহ","বুখারি ১৪১৭"],["d9","আজানের জবাব দেওয়া","মুসলিম ৩৮৩"]]],
     ["খাওয়া",[["k1","বিসমিল্লাহ বলে ডান হাতে, নিজের সামনে থেকে খাওয়া","বুখারি ৫৩৭৬"],["k2","খাওয়ার পর আঙুল চেটে খাওয়া","মুসলিম ২০৩৩"],["k3","বসে পানি পান করা","মুসলিম ২০২৪"],["k4","তিন নিঃশ্বাসে পান করা","মুসলিম ২০২৮"],["k5","খাবারের দোষ না ধরা","বুখারি ৫৪০৯"],["k6","খাওয়ার পর আলহামদুলিল্লাহ","মুসলিম ২৭৩৪"]]],
     ["ঘুম",[["g1","ওযু করে ডান কাতে শোয়া, শোয়ার দু'আ","বুখারি ২৪৭"],["g2","ঘুমের আগে আয়াতুল কুরসি","বুখারি ২৩১১"],["g3","তিন কুল পড়ে শরীরে ফুঁ দেওয়া","বুখারি ৫০১৭"],["g4","তাসবিহে ফাতিমি (৩৩-৩৩-৩৪)","বুখারি ৩৭০৫"],["g5","বিছানা ঝেড়ে শোয়া","বুখারি ৬৩২০"],["g6","রাতে সূরা মুলক","তিরমিযি ২৮৯১"]]],
     ["মানুষের সাথে",[["m1","হাসিমুখে সাক্ষাৎ","মুসলিম ২৬২৬"],["m2","হাঁচির জবাব দেওয়া","বুখারি ৬২২৪"],["m3","অসুস্থের খোঁজ নেওয়া","মুসলিম ২৫৬৮"],["m4","হাদিয়া দেওয়া","আল-আদাবুল মুফরাদ ৫৯৪"],["m5","আত্মীয়ের খোঁজ নেওয়া","বুখারি ৫৯৮৬"],["m6","রাগ হলে চুপ থাকা বা বসে পড়া","আবু দাউদ ৪৭৮২"]]],
@@ -1102,13 +1110,20 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
   const SKEY="durud-sunnah-v1";
   let sun={}; try{sun=JSON.parse(ls.get(SKEY)||"{}")||{}}catch(e){sun={}}
   /* সাদাকাহ এখন "আরো সুন্নাহ"-তে (d8): পুরোনো টিক সেখানে সরিয়ে নেওয়া */
-  {let ch=0;for(const k in sun){const v=sun[k];if(v&&v.m&&v.m.includes("sadaqah")){v.m=v.m.filter(z=>z!=="sadaqah");v.x=v.x||[];if(!v.x.includes("d8"))v.x.push("d8");ch=1}}if(ch)ls.set(SKEY,JSON.stringify(sun))}
-  const sday=ds=>{const o=sun[ds]||{};return{m:o.m||[],s:o.s||[],x:o.x||[]}};
-  function sSave(ds,o){if(!o.m.length&&!o.s.length&&!o.x.length)delete sun[ds];else sun[ds]=o;ls.set(SKEY,JSON.stringify(sun))}
-  const mainDone=(o,id)=>id==="masnun"?o.s.length>0:o.m.includes(id);
+  {let ch=0;for(const k in sun){const v=sun[k];if(v&&v.m&&v.m.includes("sadaqah")){v.m=v.m.filter(z=>z!=="sadaqah");v.x=v.x||[];if(!v.x.includes("d8"))v.x.push("d8");ch=1}if(v&&v.m&&v.m.includes("azan")){v.m=v.m.filter(z=>z!=="azan");v.x=v.x||[];if(!v.x.includes("d9"))v.x.push("d9");ch=1}}if(ch)ls.set(SKEY,JSON.stringify(sun))}
+  const sday=ds=>{const o=sun[ds]||{};return{m:o.m||[],s:o.s||[],x:o.x||[],ds}};
+  function sSave(ds,o){if(!o.m.length&&!o.s.length&&!o.x.length)delete sun[ds];else sun[ds]={m:o.m,s:o.s,x:o.x};ls.set(SKEY,JSON.stringify(sun))}
+  const durud100=ds=>{const o=dayObj(ds);return{t:dayTotal(ds),ib:o.ibrahim||0}};
+  const mainDone=(o,id)=>{const x=SMAIN.find(z=>z.id===id);
+    if(x&&x.auto){const d=durud100(o.ds);return d.t>=100&&d.ib>=10}
+    if(x&&x.subs)return x.subs.every(z=>o.s.includes(z[0]));
+    return o.m.includes(id)};
   const doneCount=ds=>{const o=sday(ds);return SMAIN.filter(x=>mainDone(o,x.id)).length};
   /* ২৪ নভেম্বরের আগের দিনগুলো পুরোনো ৫টা (সাদাকাহসহ) দিয়েই পূর্ণ ধরা হয়, যাতে টানা দিনের হিসাব না ভাঙে */
-  const suFull=ds=>{const o=sday(ds);return ds<"2026-11-24"?["salam","miswak","azan","masnun"].every(id=>mainDone(o,id))&&o.x.includes("d8"):doneCount(ds)===SMAIN.length};
+  const suFull=ds=>{const o=sday(ds);const old=id=>id==="masnun"?o.s.length>0:id==="azan"?(o.m.includes("azan")||o.x.includes("d9")):o.m.includes(id);
+    if(ds<"2026-11-24")return ["salam","miswak","azan","masnun"].every(old)&&o.x.includes("d8");
+    if(ds<"2026-11-25")return ["salam","miswak","azan","masnun","itr","surma"].every(old);
+    return doneCount(ds)===SMAIN.length};
   let suCat=0;
   function renderSunnah(){
     const td=todayStr(),o=sday(td),n=doneCount(td);
@@ -1121,14 +1136,17 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
     SMAIN.forEach(x=>{
       const on=mainDone(o,x.id),row=document.createElement("div");row.className="sit";
       const tk=document.createElement("button");tk.type="button";tk.className="tick";tk.setAttribute("aria-pressed",String(on));tk.textContent=on?"✓":"";tk.setAttribute("aria-label",x.t);
-      const t=document.createElement("div");t.className="t";const b=document.createElement("b");b.textContent=x.t;const pq=document.createElement("p");pq.textContent=x.q;t.append(b,pq);
+      const t=document.createElement("div");t.className="t";const b=document.createElement("b");b.textContent=x.t;const pq=document.createElement("p");pq.textContent=x.q;t.append(b);
+      if(x.n){const pn=document.createElement("p");pn.className="note";pn.textContent=x.n;t.append(pn)}t.append(pq);
+      if(x.auto){const d=durud100(td),pl=document.createElement("p");pl.className="live";pl.textContent="আজ: "+fmt(Math.min(d.t,100))+"/১০০ দুরুদ · ইব্রাহিম "+bn(Math.min(d.ib,10))+"/১০"+(on?" ✓":"");t.append(pl)}
       if(x.subs){
-        tk.onclick=()=>{const v=sday(td);v.s=v.s.length?[]:x.subs.map(z=>z[0]);sSave(td,v);renderSunnah()};
+        tk.onclick=()=>{const v=sday(td),ids=x.subs.map(z=>z[0]);v.s=on?v.s.filter(z=>!ids.includes(z)):[...new Set(v.s.concat(ids))];sSave(td,v);renderSunnah();if(doneCount(td)===SMAIN.length)toast("মা শা আল্লহ! আজকের নিত্যদিনের সুন্নাহ পূর্ণ 🌿")};
         const ss=document.createElement("div");ss.className="subs";
         x.subs.forEach(([sid,lab])=>{const sb=document.createElement("button");sb.type="button";sb.className="sub";const son=o.s.includes(sid);sb.setAttribute("aria-pressed",String(son));sb.textContent=(son?"✓ ":"")+lab;
           sb.onclick=()=>{const v=sday(td);v.s=v.s.includes(sid)?v.s.filter(z=>z!==sid):v.s.concat(sid);sSave(td,v);renderSunnah()};ss.appendChild(sb)});
         t.appendChild(ss);
-      }else tk.onclick=()=>{const v=sday(td);v.m=v.m.includes(x.id)?v.m.filter(z=>z!==x.id):v.m.concat(x.id);sSave(td,v);renderSunnah();if(doneCount(td)===SMAIN.length)toast("মা শা আল্লহ! আজকের নিত্যদিনের সুন্নাহ পূর্ণ 🌿")};
+      }else if(x.auto)tk.onclick=()=>toast("দুরুদ গণনা থেকে নিজে থেকেই টিক হবে");
+      else tk.onclick=()=>{const v=sday(td);v.m=v.m.includes(x.id)?v.m.filter(z=>z!==x.id):v.m.concat(x.id);sSave(td,v);renderSunnah();if(doneCount(td)===SMAIN.length)toast("মা শা আল্লহ! আজকের নিত্যদিনের সুন্নাহ পূর্ণ 🌿")};
       const wk=document.createElement("div");wk.className="wk";
       for(let i=0;i<7;i++){const ds=addDays(sat,i),dot=document.createElement("i");if(mainDone(sday(ds),x.id))dot.className="on";if(ds===td)dot.classList.add("tdy");wk.appendChild(dot)}
       t.appendChild(wk);row.append(tk,t);box.appendChild(row);
@@ -1206,8 +1224,9 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
   $("zkAr").textContent=ZIKR.ar;
   $("zkGo").onclick=()=>{setZMode(true);go("tasbih")};
   document.querySelector(".cont [data-go]").addEventListener("click",()=>setZMode(false));
+  function applyZk(){$("zkCard").hidden=!zkOn;const o=$("tSel").querySelector('option[value="zikr"]');if(o){o.hidden=!zkOn;o.disabled=!zkOn}}
   function renderHome(){
-    renderZk();
+    renderZk();applyZk();
     const td=todayStr(),t=dayTotal(td),d=state.daily;
     $("heroDay").textContent="📿 দুরুদের সফর · দিন "+bn(Math.max(1,diff(state.start,td)+1));
     {const h=hijri(td),night=dayMode==="maghrib"&&afterMaghrib();
@@ -1386,8 +1405,8 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
     try{await Promise.all(['700 40px "Noto Serif Bengali"','800 40px "Noto Serif Bengali"','400 40px "Hind Siliguri"','600 40px "Hind Siliguri"','40px "Uthmani"','40px "BnNum"','40px "Saw"'].map(f=>document.fonts.load(f,"অ১ﷺي")))}catch(e){}
     const img=await loadDome();
     const o=dayObj(ds),rows=DURUD.filter(x=>(o[x.id]||0)>0),t=dayTotal(ds),z=zkGet(ds),d=state.daily;
-    const sv=sday(ds),sDone=SMAIN.filter(x=>mainDone(sv,x.id)),sH=sDone.length?250:124;
-    const W=1080,H=1250+Math.max(1,rows.length)*66+(name?0:-86)+sH;
+    const sv=sday(ds),sDone=SMAIN.filter(x=>mainDone(sv,x.id)),sH=zkOn?0:250;
+    const W=1080,H=1250+Math.max(1,rows.length)*66+(name?0:-86)+sH-(zkOn?0:124);
     const cv=document.createElement("canvas");cv.width=W;cv.height=H;const c=cv.getContext("2d");
     const g=c.createRadialGradient(W/2,300,40,W/2,520,H*.9);g.addColorStop(0,"#2f9a64");g.addColorStop(.45,"#17603d");g.addColorStop(1,"#0b2e1e");
     c.fillStyle=g;c.fillRect(0,0,W,H);
@@ -1412,16 +1431,17 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
     rows.forEach((x,i)=>{c.textAlign="left";c.fillStyle="#fff";c.fillText(x.name,bx+34,ry+46);c.textAlign="right";c.fillStyle="#f6e2a2";c.font="700 36px "+BODY;c.fillText(fmt(o[x.id]),bx+bw-34,ry+46);c.font="400 34px "+BODY;
       if(i<rows.length-1){c.strokeStyle="rgba(255,255,255,.15)";c.setLineDash([8,8]);c.lineWidth=2;c.beginPath();c.moveTo(bx+30,ry+66);c.lineTo(bx+bw-30,ry+66);c.stroke();c.setLineDash([])}
       ry+=66});
-    y+=bh+28;rr(c,bx,y,bw,96,28);c.fillStyle="rgba(246,226,162,.14)";c.fill();c.strokeStyle="rgba(246,226,162,.5)";c.lineWidth=2;c.stroke();
+    y+=bh+28;if(zkOn){rr(c,bx,y,bw,96,28);c.fillStyle="rgba(246,226,162,.14)";c.fill();c.strokeStyle="rgba(246,226,162,.5)";c.lineWidth=2;c.stroke();
     c.textAlign="left";c.fillStyle="#fff";c.font="600 34px "+BODY;c.fillText(ZIKR.name,bx+34,y+60);
     c.textAlign="right";c.fillStyle="#f6e2a2";c.font="700 36px "+BODY;c.fillText(fmt(z)+" / "+fmt(ZIKR.goal)+(z>=ZIKR.goal?" ✓":""),bx+bw-34,y+60);
-    y+=96+28;{const bhS=sH-28;rr(c,bx,y,bw,bhS,28);c.fillStyle="rgba(0,0,0,.2)";c.fill();
+    y+=96;}
+    else{const bhS=sH-28;rr(c,bx,y,bw,bhS,28);c.fillStyle="rgba(0,0,0,.2)";c.fill();
       c.textAlign="left";c.fillStyle="#fff";c.font="600 34px "+BODY;c.fillText("নিত্যদিনের সুন্নাহ",bx+34,y+60);
       c.textAlign="right";c.fillStyle="#f6e2a2";c.font="700 36px "+BODY;c.fillText(bn(sDone.length)+" / "+bn(SMAIN.length)+(sDone.length===SMAIN.length?" ✓":""),bx+bw-34,y+60);
-      if(sDone.length){let px=bx+34,py=y+104;c.font="400 28px "+BODY;c.textAlign="left";
-        sDone.forEach(x=>{const lb="✓ "+(SU_SHORT[x.id]||x.t),w=c.measureText(lb).width+40;if(px+w>bx+bw-34){px=bx+34;py+=62}
-          rr(c,px,py,w,48,24);c.fillStyle="rgba(246,226,162,.16)";c.fill();c.strokeStyle="rgba(246,226,162,.45)";c.lineWidth=1.5;c.stroke();
-          c.fillStyle="#f6e2a2";c.fillText(lb,px+20,py+34);px+=w+14})}
+      {let px=bx+34,py=y+104;c.font="400 28px "+BODY;c.textAlign="left";
+        SMAIN.forEach(x=>{const d=sDone.includes(x),lb=(d?"✓ ":"")+(SU_SHORT[x.id]||x.t),w=c.measureText(lb).width+40;if(px+w>bx+bw-34){px=bx+34;py+=62}
+          rr(c,px,py,w,48,24);c.fillStyle=d?"rgba(246,226,162,.16)":"rgba(255,255,255,.04)";c.fill();c.strokeStyle=d?"rgba(246,226,162,.55)":"rgba(255,255,255,.18)";c.lineWidth=1.5;c.stroke();
+          c.fillStyle=d?"#f6e2a2":"rgba(255,255,255,.38)";c.fillText(lb,px+20,py+34);px+=w+14})}
       y+=bhS}
     y+=64;c.font="400 30px "+BODY;c.fillStyle="rgba(255,255,255,.78)";
     c.textAlign="left";c.fillText(goalMode==="daily"?"পূর্ণ দিন: "+bn(fullDays()):"মোট জমা: "+fmt(total()),bx+10,y);
@@ -1477,7 +1497,7 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
     document.querySelectorAll("#dayModeChips .chip").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.v===dayMode)));
     document.querySelectorAll("#hijChips .chip").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.v===hijAdj)));
     {const h=hijri(todayStr());$("hijNow").textContent=h?"অ্যাপে আজ: "+h.txt+" — এলাকার তারিখের সাথে না মিললে বদলে নিন":"এই ফোনে হিজরি তারিখ দেখানো যাচ্ছে না"}$("dailyIn").value=state.daily;$("goalIn").value=state.goal;$("startIn").value=state.start;
-    $("soundT").setAttribute("aria-pressed",String(prefs.sound));$("vibT").setAttribute("aria-pressed",String(prefs.vib));
+    $("zkT").setAttribute("aria-pressed",String(zkOn));$("soundT").setAttribute("aria-pressed",String(prefs.sound));$("vibT").setAttribute("aria-pressed",String(prefs.vib));
     {const perm=pushOK?Notification.permission:"x";$("notifT").setAttribute("aria-pressed",String(notifOn&&perm==="granted"));
      $("notifMsg").textContent=!pushOK?"এই ফোনে চালু করা যাচ্ছে না। iPhone হলে আগে অ্যাপটা Home Screen-এ যোগ করুন।":perm==="denied"?"ফোনের সেটিংসে এই অ্যাপের নোটিফিকেশন বন্ধ আছে, সেখান থেকে চালু করুন।":"সকাল ১০টা আর মাগরিবের দেড় ঘণ্টা আগে"}
     document.querySelectorAll(".sw").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.theme===theme)));
@@ -1495,6 +1515,7 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
   $("dayModeChips").onclick=e=>{const b=e.target.closest(".chip");if(b){dayMode=b.dataset.v;ls.set("durud-daymode",dayMode);lastDay=todayStr();mirror();renderSettings();render()}};
   $("hijChips").onclick=e=>{const b=e.target.closest(".chip");if(b){hijAdj=+b.dataset.v;ls.set("durud-hijadj",String(hijAdj));renderSettings();render()}};
   $("locOff").onclick=()=>{loc=null;try{localStorage.removeItem("durud-loc")}catch(e){}$("locMsg").textContent="";jOn=null;applyJumuah();renderMaghrib();notifResync()};
+  $("zkT").onclick=()=>{zkOn=!zkOn;ls.set("durud-zk",zkOn?"1":"0");if(!zkOn&&zMode)setZMode(false);applyZk();renderSettings();render()};
   $("soundT").onclick=()=>{prefs.sound=!prefs.sound;ls.set("durud-sound",prefs.sound?"1":"0");renderSettings()};
   $("vibT").onclick=()=>{prefs.vib=!prefs.vib;ls.set("durud-vib",prefs.vib?"1":"0");renderSettings()};
   $("resetBtn").onclick=()=>{$("resetConfirm").hidden=false};
@@ -1509,7 +1530,7 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
   document.querySelectorAll(".sw").forEach(b=>b.onclick=()=>applyTheme(b.dataset.theme));
 
   /* ---------- first run ---------- */
-  let suD=1000,suG=100000;
+  let suD=K==="sunnah"?100:1000,suG=100000;
   function paintSetup(){paintChips("suDaily",DAILY_OPTS,suD);paintChips("suGoal",GOAL_OPTS,suG)}
   $("suDaily").onclick=e=>{const b=e.target.closest(".chip");if(b){suD=+b.dataset.v;paintSetup()}};
   $("suGoal").onclick=e=>{const b=e.target.closest(".chip");if(b){suG=+b.dataset.v;paintSetup()}};
