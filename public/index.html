@@ -487,6 +487,8 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
         <div class="ring2"><svg viewBox="0 0 78 78" aria-hidden="true"><circle cx="39" cy="39" r="32" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="8"/><circle id="suArc" cx="39" cy="39" r="32" fill="none" stroke="#e8c873" stroke-width="8" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="201"/></svg><b class="num" id="suDone">০/৫</b></div>
         <div><strong>নিত্যদিনের সুন্নাহ</strong><p id="suSub"></p></div>
       </div>
+      <div class="card hdcard"><div class="rowline" style="flex-wrap:nowrap;gap:12px"><span style="flex:1;min-width:0"><b style="color:var(--g)">হায়েজ চলছে</b><small style="display:block;color:var(--muted);font-size:12.5px">চালু করলে স্বলাত, হিযব ও সূরা মুলক বাদ থাকবে</small></span><button class="toggle" type="button" id="hdT" style="flex:none" aria-pressed="false" aria-label="হায়েজ চলছে"></button></div>
+        <p id="hdNote" hidden style="margin:8px 0 0;font-size:12.5px;color:var(--accent)">পবিত্র হলে বন্ধ করে দিন। তথ্যটা শুধু আপনার ফোনেই থাকে।</p></div>
       <div class="card"><div class="h">নিত্যদিনের সুন্নাহ <small>এই সপ্তাহ</small></div><div class="smain" id="suMain"></div></div>
       <div class="card more"><div class="h">আরো সুন্নাহ <small>ইচ্ছেমতো</small></div>
         <div class="chips" id="suCats" style="margin:10px 0 4px"></div><div id="suMore"></div></div>
@@ -887,6 +889,7 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
           if(c+1>=a.n){delete akOpen[a.id];akSync(td,w)}renderAzkar()}}
       e.append(b);list.append(e)});
   }
+  $("hdT").onclick=()=>{const td=todayStr();haid.on=!hd(td);if(haid.on){if(!hd(td))haid.days.push(td)}else haid.days=haid.days.filter(d=>d!==td);hSave();renderSunnah()};
   $("akM").onclick=()=>{akTab="m";renderAzkar()};$("akE").onclick=()=>{akTab="e";renderAzkar()};
   $("akBack").onclick=()=>history.length>1?history.back():go("home");
 
@@ -1167,10 +1170,10 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
   /* ---------- Sunnah revival ---------- */
   const SMAIN=[
     {id:"salam",t:"সালামের প্রসার করা",n:"ছোট বড় সবাইকে আগে সালাম দেওয়া",q:"“তোমরা পরস্পরে সালামের প্রসার ঘটাও।” · মুসলিম ৫৪"},
-    {id:"miswak",t:"প্রত্যেক সালাতের আগে মিসওয়াক করা",q:"“উম্মতের কষ্ট না হলে প্রতি নামাজে মিসওয়াকের আদেশ দিতাম।” · বুখারি ৮৮৭"},
-    {id:"awwal",t:"৫ ওয়াক্ত সালাত আওয়াল ওয়াক্তে আদায় করা",q:"আল্লহর কাছে সবচেয়ে প্রিয় আমল: সময়মতো সালাত · বুখারি ৫২৭",subs:[["fajr","ফজর"],["zuhr","যোহর"],["asr","আসর"],["magh","মাগরিব"],["isha","ইশা"]]},
-    {id:"masnun",t:"সকাল-সন্ধ্যার মাসনুন আমল, রাতে সূরা মুলক",q:"নবীজী ﷺ সূরা সাজদা ও সূরা মুলক না পড়ে ঘুমাতেন না · তিরমিযি ২৮৯২",subs:[["sokal","সকাল"],["sondha","সন্ধ্যা"],["mulk","সূরা মুলক"]]},
-    {id:"hizb",t:"হিযব আদায় করা",n:"প্রতিদিন কমপক্ষে এক পৃষ্ঠা হলেও কুরআন তিলাওয়াত",q:"ঘুমের কারণে হিযব ছুটে গেলে ফজর ও যোহরের মাঝে পড়ে নিলে রাতে পড়ার মতোই লেখা হয় · মুসলিম ৭৪৭"},
+    {id:"miswak",t:"প্রত্যেক সালাতের আগে মিসওয়াক করা",q:"“উম্মতের কষ্ট না হলে প্রতি নামাজে মিসওয়াকের আদেশ দিতাম।” · বুখারি ৮৮৭",subs:[["w_fajr","ফজর"],["w_zuhr","যোহর"],["w_asr","আসর"],["w_magh","মাগরিব"],["w_isha","ইশা"]]},
+    {id:"awwal",hx:1,t:"৫ ওয়াক্ত সালাত আওয়াল ওয়াক্তে আদায় করা",q:"আল্লহর কাছে সবচেয়ে প্রিয় আমল: সময়মতো সালাত · বুখারি ৫২৭",subs:[["fajr","ফজর"],["zuhr","যোহর"],["asr","আসর"],["magh","মাগরিব"],["isha","ইশা"]]},
+    {id:"masnun",t:"সকাল-সন্ধ্যার মাসনুন আমল, রাতে সূরা মুলক",q:"নবীজী ﷺ সূরা সাজদা ও সূরা মুলক না পড়ে ঘুমাতেন না · তিরমিযি ২৮৯২",subs:[["sokal","সকাল"],["sondha","সন্ধ্যা"],["mulk","সূরা মুলক",1]]},
+    {id:"hizb",hx:1,t:"হিযব আদায় করা",n:"প্রতিদিন কমপক্ষে এক পৃষ্ঠা হলেও কুরআন তিলাওয়াত",q:"ঘুমের কারণে হিযব ছুটে গেলে ফজর ও যোহরের মাঝে পড়ে নিলে রাতে পড়ার মতোই লেখা হয় · মুসলিম ৭৪৭"},
     {id:"itr",t:"আতর ব্যবহার করা",n:"নন-মাহরামের সামনে ও বাইরে বের হলে আতর ব্যবহার নিষিদ্ধ · আবু দাউদ ৪১৭৩",q:"“দুনিয়ার মধ্যে আমার কাছে প্রিয় করে দেওয়া হয়েছে নারী ও সুগন্ধি, আর নামাজে রাখা হয়েছে আমার চোখের শীতলতা।” · নাসাঈ ৩৯৩৯"},
     {id:"istighfar",t:"১০০ বার ইস্তেগফার",q:"“আমি দিনে আল্লহর কাছে ১০০ বার তাওবা করি।” · মুসলিম ২৭০২"},
     {id:"surma",t:"রাতে চোখে ৩ বার করে সুরমা লাগানো",q:"“তোমাদের সুরমার মধ্যে উত্তম হলো ইসমিদ, তা দৃষ্টি পরিষ্কার করে ও পাপড়ি গজায়।” · আবু দাউদ ৩৮৭৮"}
@@ -1190,26 +1193,35 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
   const sday=ds=>{const o=sun[ds]||{};return{m:o.m||[],s:o.s||[],x:o.x||[],ds}};
   function sSave(ds,o){if(!o.m.length&&!o.s.length&&!o.x.length)delete sun[ds];else sun[ds]={m:o.m,s:o.s,x:o.x};ls.set(SKEY,JSON.stringify(sun))}
   const durud100=ds=>{const o=dayObj(ds);return{t:dayTotal(ds),ib:o.ibrahim||0}};
+  /* হায়েজ মোড: চালু থাকলে স্বলাত, হিযব ও সূরা মুলক বাদ (দিনভিত্তিক রেকর্ড, তথ্য শুধু এই ফোনে) */
+  let haid={on:false,days:[]};try{haid=Object.assign(haid,JSON.parse(ls.get("durud-haid")||"{}"))}catch(e){}
+  const hSave=()=>ls.set("durud-haid",JSON.stringify({on:haid.on,days:haid.days.slice(-120)}));
+  const hd=ds=>haid.days.includes(ds);
+  try{const td=todayStr();if(haid.on&&!hd(td)){haid.days.push(td);hSave()}}catch(e){}
+  const act=ds=>SMAIN.filter(x=>!(x.hx&&hd(ds)));
+  const subsOf=(x,ds)=>x.subs.filter(z=>!(z[2]&&hd(ds)));
   const mainDone=(o,id)=>{const x=SMAIN.find(z=>z.id===id);
+    if(id==="miswak"&&o.m.includes("miswak"))return true;
     if(x&&x.auto){const d=durud100(o.ds);return d.t>=100&&d.ib>=10}
-    if(x&&x.subs)return x.subs.every(z=>o.s.includes(z[0]));
+    if(x&&x.subs)return subsOf(x,o.ds).every(z=>o.s.includes(z[0]));
     return o.m.includes(id)};
-  const doneCount=ds=>{const o=sday(ds);return SMAIN.filter(x=>mainDone(o,x.id)).length};
+  const doneCount=ds=>{const o=sday(ds);return act(ds).filter(x=>mainDone(o,x.id)).length};
   /* ২৪ নভেম্বরের আগের দিনগুলো পুরোনো ৫টা (সাদাকাহসহ) দিয়েই পূর্ণ ধরা হয়, যাতে টানা দিনের হিসাব না ভাঙে */
   const suFull=ds=>{const o=sday(ds);const old=id=>id==="masnun"?o.s.length>0:id==="azan"?(o.m.includes("azan")||o.x.includes("d9")):o.m.includes(id);
     if(ds<"2026-11-24")return ["salam","miswak","azan","masnun"].every(old)&&o.x.includes("d8");
     if(ds<"2026-11-25")return ["salam","miswak","azan","masnun","itr","surma"].every(old);
-    return doneCount(ds)===SMAIN.length};
+    return doneCount(ds)===act(ds).length};
   let suCat=0;
   function renderSunnah(){
-    const td=todayStr(),o=sday(td),n=doneCount(td);
-    $("suDone").textContent=bn(n)+"/"+bn(SMAIN.length);$("suArc").setAttribute("stroke-dashoffset",(201*(1-n/SMAIN.length)).toFixed(1));
+    const td=todayStr(),o=sday(td),n=doneCount(td),AL=act(td),NT=AL.length;
+    $("suDone").textContent=bn(n)+"/"+bn(NT);$("suArc").setAttribute("stroke-dashoffset",(201*(1-n/NT)).toFixed(1));
+    $("hdT").setAttribute("aria-pressed",String(hd(td)));$("hdNote").hidden=!hd(td);
     let st=0,cur=suFull(td)?td:addDays(td,-1);while(suFull(cur)&&st<999){st++;cur=addDays(cur,-1)}
-    const mon=td.slice(0,7);let tot=0;for(const k in sun){if(k.slice(0,7)===mon){const v=sday(k);tot+=SMAIN.filter(x=>mainDone(v,x.id)).length+v.x.length}}
+    const mon=td.slice(0,7);let tot=0;for(const k in sun){if(k.slice(0,7)===mon){const v=sday(k);tot+=act(k).filter(x=>mainDone(v,x.id)).length+v.x.length}}
     $("suSub").textContent=(st>=1?"টানা "+bn(st)+" দিন সব পূর্ণ · ":"")+"এই মাসে "+bn(tot)+" বার সুন্নাহ জীবিত করেছেন";
     const dow=(parse(td).getDay()+1)%7,sat=addDays(td,-dow);
     const box=$("suMain");box.innerHTML="";
-    SMAIN.forEach(x=>{
+    AL.forEach(x=>{
       const on=mainDone(o,x.id),row=document.createElement("div");row.className="sit";
       const tk=document.createElement("button");tk.type="button";tk.className="tick";tk.setAttribute("aria-pressed",String(on));tk.textContent=on?"✓":"";tk.setAttribute("aria-label",x.t);
       const t=document.createElement("div");t.className="t";const b=document.createElement("b");b.textContent=x.t;const pq=document.createElement("p");pq.textContent=x.q;t.append(b);
@@ -1217,13 +1229,13 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
       if(x.id==="masnun"){const lk=document.createElement("button");lk.type="button";lk.className="pill";lk.textContent="সকাল-সন্ধ্যার আমল পড়ুন →";lk.style.cssText="margin-top:7px;background:var(--g);color:var(--on-g);border:0";lk.dataset.go="azkar";t.append(lk)}
       if(x.auto){const d=durud100(td),pl=document.createElement("p");pl.className="live";pl.textContent="আজ: "+fmt(Math.min(d.t,100))+"/১০০ দুরুদ · ইব্রাহিম "+bn(Math.min(d.ib,10))+"/১০"+(on?" ✓":"");t.append(pl)}
       if(x.subs){
-        tk.onclick=()=>{const v=sday(td),ids=x.subs.map(z=>z[0]);v.s=on?v.s.filter(z=>!ids.includes(z)):[...new Set(v.s.concat(ids))];sSave(td,v);renderSunnah();if(doneCount(td)===SMAIN.length)toast("মা শা আল্লহ! আজকের নিত্যদিনের সুন্নাহ পূর্ণ 🌿")};
+        tk.onclick=()=>{const v=sday(td),ids=subsOf(x,td).map(z=>z[0]);v.s=on?v.s.filter(z=>!ids.includes(z)):[...new Set(v.s.concat(ids))];sSave(td,v);renderSunnah();if(doneCount(td)===NT)toast("মা শা আল্লহ! আজকের নিত্যদিনের সুন্নাহ পূর্ণ 🌿")};
         const ss=document.createElement("div");ss.className="subs";
-        x.subs.forEach(([sid,lab])=>{const sb=document.createElement("button");sb.type="button";sb.className="sub";const son=o.s.includes(sid);sb.setAttribute("aria-pressed",String(son));sb.textContent=(son?"✓ ":"")+lab;
+        subsOf(x,td).forEach(([sid,lab])=>{const sb=document.createElement("button");sb.type="button";sb.className="sub";const son=o.s.includes(sid);sb.setAttribute("aria-pressed",String(son));sb.textContent=(son?"✓ ":"")+lab;
           sb.onclick=()=>{const v=sday(td);v.s=v.s.includes(sid)?v.s.filter(z=>z!==sid):v.s.concat(sid);sSave(td,v);renderSunnah()};ss.appendChild(sb)});
         t.appendChild(ss);
       }else if(x.auto)tk.onclick=()=>toast("দুরুদ গণনা থেকে নিজে থেকেই টিক হবে");
-      else tk.onclick=()=>{const v=sday(td);v.m=v.m.includes(x.id)?v.m.filter(z=>z!==x.id):v.m.concat(x.id);sSave(td,v);renderSunnah();if(doneCount(td)===SMAIN.length)toast("মা শা আল্লহ! আজকের নিত্যদিনের সুন্নাহ পূর্ণ 🌿")};
+      else tk.onclick=()=>{const v=sday(td);v.m=v.m.includes(x.id)?v.m.filter(z=>z!==x.id):v.m.concat(x.id);sSave(td,v);renderSunnah();if(doneCount(td)===NT)toast("মা শা আল্লহ! আজকের নিত্যদিনের সুন্নাহ পূর্ণ 🌿")};
       const wk=document.createElement("div");wk.className="wk";
       for(let i=0;i<7;i++){const ds=addDays(sat,i),dot=document.createElement("i");if(mainDone(sday(ds),x.id))dot.className="on";if(ds===td)dot.classList.add("tdy");wk.appendChild(dot)}
       t.appendChild(wk);row.append(tk,t);box.appendChild(row);
@@ -1483,7 +1495,7 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
     try{await Promise.all(['700 40px "Noto Serif Bengali"','800 40px "Noto Serif Bengali"','400 40px "Hind Siliguri"','600 40px "Hind Siliguri"','40px "Uthmani"','40px "BnNum"','40px "Saw"','40px "RD"'].map(f=>document.fonts.load(f,"অ১ﷺي")))}catch(e){}
     const img=await loadDome();
     const o=dayObj(ds),rows=DURUD.filter(x=>(o[x.id]||0)>0),t=dayTotal(ds),z=zkGet(ds),d=state.daily;
-    const sv=sday(ds),sDone=SMAIN.filter(x=>mainDone(sv,x.id)),sH=zkOn?0:250;
+    const sv=sday(ds),SA=act(ds),sDone=SA.filter(x=>mainDone(sv,x.id)),sH=zkOn?0:250;
     const W=1080,H=1250+Math.max(1,rows.length)*66+(name?0:-86)+sH-(zkOn?0:124);
     const cv=document.createElement("canvas");cv.width=W;cv.height=H;const c=cv.getContext("2d");
     const g=c.createRadialGradient(W/2,300,40,W/2,520,H*.9);g.addColorStop(0,"#2f9a64");g.addColorStop(.45,"#17603d");g.addColorStop(1,"#0b2e1e");
@@ -1515,9 +1527,11 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
     y+=96;}
     else{const bhS=sH-28;rr(c,bx,y,bw,bhS,28);c.fillStyle="rgba(0,0,0,.2)";c.fill();
       c.textAlign="left";c.fillStyle="#fff";c.font="600 34px "+BODY;c.fillText("নিত্যদিনের সুন্নাহ",bx+34,y+60);
-      c.textAlign="right";c.fillStyle="#f6e2a2";c.font="700 36px "+BODY;c.fillText(bn(sDone.length)+" / "+bn(SMAIN.length)+(sDone.length===SMAIN.length?" ✓":""),bx+bw-34,y+60);
+      if(hd(ds)){const tw=c.measureText("নিত্যদিনের সুন্নাহ").width;c.font="500 24px "+BODY;const lb="হায়েজরত",lw=c.measureText(lb).width+28,lx=bx+34+tw+16;
+        rr(c,lx,y+30,lw,40,20);c.fillStyle="rgba(255,255,255,.12)";c.fill();c.strokeStyle="rgba(255,255,255,.35)";c.lineWidth=1.5;c.stroke();c.fillStyle="rgba(255,255,255,.85)";c.fillText(lb,lx+14,y+58)}
+      c.textAlign="right";c.fillStyle="#f6e2a2";c.font="700 36px "+BODY;c.fillText(bn(sDone.length)+" / "+bn(SA.length)+(sDone.length===SA.length?" ✓":""),bx+bw-34,y+60);
       {let px=bx+34,py=y+104;c.font="400 28px "+BODY;c.textAlign="left";
-        SMAIN.forEach(x=>{const d=sDone.includes(x),lb=(d?"✓ ":"")+(SU_SHORT[x.id]||x.t),w=c.measureText(lb).width+40;if(px+w>bx+bw-34){px=bx+34;py+=62}
+        SA.forEach(x=>{const d=sDone.includes(x),lb=(d?"✓ ":"")+(SU_SHORT[x.id]||x.t),w=c.measureText(lb).width+40;if(px+w>bx+bw-34){px=bx+34;py+=62}
           rr(c,px,py,w,48,24);c.fillStyle=d?"rgba(246,226,162,.16)":"rgba(255,255,255,.04)";c.fill();c.strokeStyle=d?"rgba(246,226,162,.55)":"rgba(255,255,255,.18)";c.lineWidth=1.5;c.stroke();
           c.fillStyle=d?"#f6e2a2":"rgba(255,255,255,.38)";c.fillText(lb,px+20,py+34);px+=w+14})}
       y+=bhS}
