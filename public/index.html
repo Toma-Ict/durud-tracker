@@ -1495,7 +1495,11 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
     try{await Promise.all(['700 40px "Noto Serif Bengali"','800 40px "Noto Serif Bengali"','400 40px "Hind Siliguri"','600 40px "Hind Siliguri"','40px "Uthmani"','40px "BnNum"','40px "Saw"','40px "RD"'].map(f=>document.fonts.load(f,"অ১ﷺي")))}catch(e){}
     const img=await loadDome();
     const o=dayObj(ds),rows=DURUD.filter(x=>(o[x.id]||0)>0),t=dayTotal(ds),z=zkGet(ds),d=state.daily;
-    const sv=sday(ds),SA=act(ds),sDone=SA.filter(x=>mainDone(sv,x.id)),sH=zkOn?0:250;
+    const sv=sday(ds),SA=act(ds),sDone=SA.filter(x=>mainDone(sv,x.id));
+    const chipLb=x=>{const d=sDone.includes(x),sb=x.subs?subsOf(x,ds):null,k=sb?sb.filter(z=>sv.s.includes(z[0])).length:0;const nm=(d?"✓ ":"")+(SU_SHORT[x.id]||x.t),cn=sb&&!d?" "+bn(k)+"/"+bn(sb.length):"";return{d,part:!d&&k>0,nm,cn,lb:nm+cn}};
+    const chipW=(m,o)=>{m.font="400 28px "+BODY;let w=m.measureText(o.nm).width;m.font="400 23px "+BODY;return w+(o.cn?m.measureText(o.cn).width:0)+40};
+    let sRows=1;{const m=document.createElement("canvas").getContext("2d");let px=0;const lim=872;SA.forEach(x=>{const w=chipW(m,chipLb(x));if(px&&px+w>lim){sRows++;px=0}px+=w+14})}
+    const sH=zkOn?0:(104+sRows*62+52);
     const W=1080,H=1250+Math.max(1,rows.length)*66+(name?0:-86)+sH-(zkOn?0:124);
     const cv=document.createElement("canvas");cv.width=W;cv.height=H;const c=cv.getContext("2d");
     const g=c.createRadialGradient(W/2,300,40,W/2,520,H*.9);g.addColorStop(0,"#2f9a64");g.addColorStop(.45,"#17603d");g.addColorStop(1,"#0b2e1e");
@@ -1531,9 +1535,10 @@ body.jumuah #v-tasbih .bring svg{filter:drop-shadow(0 0 10px rgba(246,226,162,.4
         rr(c,lx,y+30,lw,40,20);c.fillStyle="rgba(255,255,255,.12)";c.fill();c.strokeStyle="rgba(255,255,255,.35)";c.lineWidth=1.5;c.stroke();c.fillStyle="rgba(255,255,255,.85)";c.fillText(lb,lx+14,y+58)}
       c.textAlign="right";c.fillStyle="#f6e2a2";c.font="700 36px "+BODY;c.fillText(bn(sDone.length)+" / "+bn(SA.length)+(sDone.length===SA.length?" ✓":""),bx+bw-34,y+60);
       {let px=bx+34,py=y+104;c.font="400 28px "+BODY;c.textAlign="left";
-        SA.forEach(x=>{const d=sDone.includes(x),lb=(d?"✓ ":"")+(SU_SHORT[x.id]||x.t),w=c.measureText(lb).width+40;if(px+w>bx+bw-34){px=bx+34;py+=62}
-          rr(c,px,py,w,48,24);c.fillStyle=d?"rgba(246,226,162,.16)":"rgba(255,255,255,.04)";c.fill();c.strokeStyle=d?"rgba(246,226,162,.55)":"rgba(255,255,255,.18)";c.lineWidth=1.5;c.stroke();
-          c.fillStyle=d?"#f6e2a2":"rgba(255,255,255,.38)";c.fillText(lb,px+20,py+34);px+=w+14})}
+        SA.forEach(x=>{const o=chipLb(x),{d,part}=o,w=chipW(c,o);if(px+w>bx+bw-34){px=bx+34;py+=62}
+          rr(c,px,py,w,48,24);c.fillStyle=d?"rgba(246,226,162,.16)":part?"rgba(255,138,120,.18)":"rgba(229,57,53,.22)";c.fill();c.strokeStyle=d?"rgba(246,226,162,.55)":part?"rgba(255,160,140,.65)":"rgba(239,83,80,.75)";c.lineWidth=1.5;c.stroke();
+          c.fillStyle=d?"#f6e2a2":part?"#ffc2b5":"#ff9a90";c.textAlign="left";c.font="400 28px "+BODY;c.fillText(o.nm,px+20,py+34);
+          if(o.cn){const nw=c.measureText(o.nm).width;c.font="400 23px "+BODY;c.fillText(o.cn,px+20+nw,py+33)}px+=w+14})}
       y+=bhS}
     y+=64;c.font="400 30px "+BODY;c.fillStyle="rgba(255,255,255,.78)";
     c.textAlign="left";c.fillText(goalMode==="daily"?"পূর্ণ দিন: "+bn(fullDays()):"মোট জমা: "+fmt(total()),bx+10,y);
